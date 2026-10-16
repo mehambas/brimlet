@@ -1,0 +1,9 @@
+.DS_Store
+.build/
+.swiftpm/
+dist/
+/NEXT_SESSION.md
+/docs/handoff-*.md
+/docs/opendesign-*.md
+/docs/*.tr.md
+/scripts/cmux-sidebar/
