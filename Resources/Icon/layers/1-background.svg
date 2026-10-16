@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<title>Brimlet layer 1: background</title>
+<defs><linearGradient id="bg" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F6F9FC"/><stop offset="0.55" stop-color="#E4ECF5"/><stop offset="1" stop-color="#D3DEEB"/></linearGradient></defs>
+<g id="background" transform="matrix(1.2427 0 0 1.2427 -124.27 -124.27)"><rect x="100" y="100" width="824" height="824" fill="url(#bg)"/></g>
+</svg>
