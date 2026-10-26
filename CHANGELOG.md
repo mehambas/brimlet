@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0
+
+A refreshed Mac interface inspired by Brimlet’s graphite and mint icon.
+
+- Five native settings tabs: General, Modules, Calendar, Notifications and Quotes, in a compact 520 pt window.
+- Settings, task entry and quote cards follow the Mac’s light or dark appearance.
+- Graphite surfaces, clearer text and more focused mint accents in the notch panel.
+- Updated music controls, calendar rows, task filters and quote cards.
+- Drag to reorder modules, with the existing up/down buttons also available.
+- Calendar colors and app names make calendars and allowed notification senders easier to recognize.
+- Updated English and Turkish interface text and keyboard controls.
+
 ## 0.1.0
 
 First public release.
