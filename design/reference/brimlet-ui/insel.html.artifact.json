@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "brimlet-ui/insel.html",
+  "entry": "brimlet-ui/insel.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-10-26T13:20:11.095Z",
+  "updatedAt": "2026-10-26T13:20:11.095Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

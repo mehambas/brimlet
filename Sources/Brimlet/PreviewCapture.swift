@@ -38,7 +38,9 @@ final class MemoryDefaults: UserDefaults {
                 let height = sample.map { QuotePanelController.readingHeight(for: $0, width: 400, maximum: 480) } ?? 0
                 let view = QuotePanelView(draftText: quote.text, quote: sample, width: 400, contentHeight: height,
                     preferences: preferences, onSave: { _, _, _ in }, onClose: {}, onHover: { _ in })
-                try save(view.padding(32).background(Color(red: 0.94, green: 0.95, blue: 0.94)), to: "\(directory)/\(name).png")
+                for scheme in [ColorScheme.light, .dark] {
+                    try save(view.padding(32).background(Color(nsColor: .windowBackgroundColor)), to: "\(directory)/\(scheme)-\(name).png", scheme: scheme)
+                }
             }
             print("Quote previews: \(directory)")
         } catch { fputs("Quote preview error: \(error)\n", stderr) }
@@ -71,11 +73,30 @@ final class MemoryDefaults: UserDefaults {
             try save(IslandView(model: lyricsModel).padding(40).background(background), to: "\(directory)/lyrics.png")
             let model = AppModel(demo: true)
             model.preparePreview()
-            for tab in [SettingsTab.modules, .appearance, .general, .quotes] {
-                model.settingsTab = tab
-                try save(SettingsView(model: model, preferences: model.preferences, updater: model.updater),
-                         to: "\(directory)/settings-\(tab).png")
+            for scheme in [ColorScheme.light, .dark] {
+                for tab in SettingsTab.allCases {
+                    model.settingsTab = tab
+                    try captureSettings(model: model, scheme: scheme, to: "\(directory)/\(scheme)-settings-\(tab).png")
+                }
+                try save(TodoEditor(module: model.todos), to: "\(directory)/\(scheme)-task-editor.png", scheme: scheme)
             }
+            model.select(.todos)
+            model.todos.add(title: "Read the design notes", note: "Brimlet", category: .work, dueDate: Date(), reminder: false)
+            try save(IslandView(model: model).padding(40).background(background), to: "\(directory)/tasks.png")
+            let enabledCalendar = AppModel(demo: true)
+            enabledCalendar.preferences.calendarEnabled = true
+            enabledCalendar.applyPreferences()
+            enabledCalendar.calendar.preparePreview()
+            enabledCalendar.settingsTab = .calendar
+            for scheme in [ColorScheme.light, .dark] {
+                try captureSettings(model: enabledCalendar, scheme: scheme, to: "\(directory)/\(scheme)-settings-calendar-enabled.png")
+            }
+            let timerModel = AppModel(demo: true)
+            timerModel.preparePreview(timer: true)
+            timerModel.timer.togglePause()
+            try save(IslandView(model: timerModel).padding(40).background(background), to: "\(directory)/timer-paused.png")
+            timerModel.timer.reset()
+            try save(IslandView(model: timerModel).padding(40).background(background), to: "\(directory)/timer-idle.png")
             let externalModel = AppModel(demo: true)
             externalModel.preparePreview(compact: true)
             externalModel.showExternalNotification(SampleData.notification)
@@ -92,8 +113,32 @@ final class MemoryDefaults: UserDefaults {
         } catch { fputs("Preview error: \(error)\n", stderr) }
     }
 
-    static func save<V: View>(_ view: V, to path: String) throws {
-        let image = try render(view)
+    static func captureSettings(model: AppModel, scheme: ColorScheme, to path: String) throws {
+        let requestedTab = model.settingsTab
+        let controller = SettingsController(model: model)
+        let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: 520, height: 620),
+                              styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.appearance = NSAppearance(named: scheme == .dark ? .darkAqua : .aqua)
+        window.contentViewController = controller
+        controller.select(requestedTab)
+        window.setFrameOrigin(NSPoint(x: -10000, y: -10000))
+        window.makeKeyAndOrderFront(nil)
+        defer { window.orderOut(nil) }
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        guard let view = window.contentView?.superview else { throw NSError(domain: "BrimletPreview", code: 3) }
+        view.layoutSubtreeIfNeeded()
+        guard model.settingsTab == requestedTab, controller.selectedTabViewItemIndex == SettingsTab.allCases.firstIndex(of: requestedTab), abs(window.contentLayoutRect.width - 520) < 1 else {
+            throw NSError(domain: "BrimletPreview.SettingsLayout", code: 6)
+        }
+        guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { throw NSError(domain: "BrimletPreview", code: 4) }
+        view.cacheDisplay(in: view.bounds, to: bitmap)
+        guard let data = bitmap.representation(using: .png, properties: [:]) else { throw NSError(domain: "BrimletPreview", code: 5) }
+        try data.write(to: URL(fileURLWithPath: path))
+    }
+
+    static func save<V: View>(_ view: V, to path: String, scheme: ColorScheme = .dark) throws {
+        let image = try render(view, scheme: scheme)
         guard let data = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]) else {
             throw NSError(domain: "BrimletPreview", code: 2)
         }
@@ -101,15 +146,15 @@ final class MemoryDefaults: UserDefaults {
     }
 
     /// An offscreen window rather than ImageRenderer, which leaves AppKit-backed controls such as segmented pickers blank.
-    static func render<V: View>(_ view: V) throws -> CGImage {
-        let hosting = NSHostingView(rootView: view.environment(\.colorScheme, .dark))
-        hosting.appearance = NSAppearance(named: .darkAqua)
+    static func render<V: View>(_ view: V, scheme: ColorScheme = .dark) throws -> CGImage {
+        let hosting = NSHostingView(rootView: view.environment(\.colorScheme, scheme))
+        hosting.appearance = NSAppearance(named: scheme == .dark ? .darkAqua : .aqua)
         let size = hosting.fittingSize
         hosting.frame = NSRect(origin: .zero, size: size)
         let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: size.width, height: size.height),
                               styleMask: .borderless, backing: .buffered, defer: false)
         window.contentView = hosting
-        window.appearance = NSAppearance(named: .darkAqua)
+        window.appearance = NSAppearance(named: scheme == .dark ? .darkAqua : .aqua)
         window.isReleasedWhenClosed = false
         window.orderFront(nil)
         defer { window.orderOut(nil) }
@@ -197,6 +242,21 @@ final class MemoryDefaults: UserDefaults {
         RunLoop.current.run(until: Date().addingTimeInterval(1.2))
         let expires = model.externalNotification == nil && !model.isPeeking
         let externalPass = hiddenRejects && expandedRejects && timerWins && externalShows && duplicateHandled && busyHandled && musicDoesNotReplace && pinRestored && expires
+        let settings = SettingsController(model: model)
+        let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: 520, height: 620),
+                              styleMask: [.titled, .closable], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentViewController = settings
+        var settingsPass = true
+        for tab in SettingsTab.allCases {
+            settings.select(tab)
+            settingsPass = settingsPass && model.settingsTab == tab
+                && settings.selectedTabViewItemIndex == SettingsTab.allCases.firstIndex(of: tab)
+                && abs(window.contentLayoutRect.width - 520) < 1
+        }
+        settings.select(.general)
+        settingsPass = settingsPass && model.settingsTab == .general
+        window.orderOut(nil)
         let result: [String: Any] = [
             "compactWidth": compact.width, "expandedWidth": expanded.width,
             "topEdgePreserved": abs(compact.maxY - expanded.maxY) < 1,
@@ -207,7 +267,8 @@ final class MemoryDefaults: UserDefaults {
             "calendarNavigation": calendarWorks, "calendarDisableClearsEvents": calendarDisables,
             "screenCount": NSScreen.screens.count,
             "externalNotifications": externalPass,
-            "pass": expanded.width > compact.width && compact == restored && selectionWorks && pauseWorks && disablingWorks && calendarDefaultsOff && calendarWorks && calendarDisables && externalPass
+            "settingsNavigationAndSize": settingsPass,
+            "pass": expanded.width > compact.width && compact == restored && selectionWorks && pauseWorks && disablingWorks && calendarDefaultsOff && calendarWorks && calendarDisables && externalPass && settingsPass
         ]
         if let data = try? JSONSerialization.data(withJSONObject: result, options: [.prettyPrinted, .sortedKeys]) {
             try? data.write(to: URL(fileURLWithPath: NSTemporaryDirectory() + "brimlet-smoke-test.json"))

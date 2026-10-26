@@ -20,6 +20,7 @@ import SwiftUI
     private let updateSeparator = NSMenuItem.separator()
     private var updateSubscription: AnyCancellable?
     private var settingsWindow: NSWindow?
+    private var settingsController: SettingsController?
     private var externalReceiver: ExternalNotificationReceiver!
     private var quotePanel: QuotePanelController!
 
@@ -120,17 +121,19 @@ import SwiftUI
         model.collapse()
         if let tab { model.settingsTab = tab }
         if settingsWindow == nil {
-            let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 700, height: 550),
+            let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 620),
                                   styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
             window.title = String(localized: "Brimlet Settings")
             window.titlebarAppearsTransparent = true
-            window.backgroundColor = NSColor(red: 0.075, green: 0.085, blue: 0.085, alpha: 1)
-            window.appearance = NSAppearance(named: .darkAqua)
+            window.backgroundColor = .windowBackgroundColor
             window.isReleasedWhenClosed = false
-            window.contentView = NSHostingView(rootView: SettingsView(model: model, preferences: model.preferences, updater: model.updater))
+            let controller = SettingsController(model: model)
+            settingsController = controller
+            window.contentViewController = controller
             window.center()
             settingsWindow = window
         }
+        settingsController?.select(model.settingsTab)
         NSApp.activate(ignoringOtherApps: true)
         settingsWindow?.makeKeyAndOrderFront(nil)
     }

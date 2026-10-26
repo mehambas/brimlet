@@ -30,7 +30,7 @@ Tasks and quotes are stored as JSON in the app's preferences. Task reminders are
 
 ## cmux
 
-If [cmux](https://cmux.com) is installed, **Settings › Modules** offers to show coding sessions that wait for a reply. It is off by default. Brimlet then asks the cmux command line tool every five seconds for workspaces, sessions and notifications and shows a session whose workspace description carries the status `Ready` or `Needs input`. A separate status bridge has to write that status; without one nothing appears. Commands run without a shell.
+If [cmux](https://cmux.com) is installed, **Settings › Notifications** offers to show coding sessions that wait for a reply. It is off by default. Brimlet then asks the cmux command line tool every five seconds for workspaces, sessions and notifications and shows a session whose workspace description carries the status `Ready` or `Needs input`. A separate status bridge has to write that status; without one nothing appears. Commands run without a shell.
 
 ## Settings and data
 

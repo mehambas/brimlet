@@ -7,6 +7,7 @@ struct CalendarSource: Identifiable, Sendable {
     let id: String
     let title: String
     let account: String
+    var colorRGB: UInt32? = nil
 }
 
 private actor CalendarStore {
@@ -18,6 +19,11 @@ private actor CalendarStore {
         return value
     }
 
+    private static func rgb(_ color: CGColor?) -> UInt32? {
+        guard let color, let rgb = NSColor(cgColor: color)?.usingColorSpace(.sRGB) else { return nil }
+        return UInt32((rgb.redComponent * 255).rounded()) << 16 | UInt32((rgb.greenComponent * 255).rounded()) << 8 | UInt32((rgb.blueComponent * 255).rounded())
+    }
+
     func requestAccess() async throws -> Bool {
         try await eventStore().requestFullAccessToEvents()
     }
@@ -25,7 +31,7 @@ private actor CalendarStore {
     func calendars() -> [CalendarSource] {
         guard EKEventStore.authorizationStatus(for: .event) == .fullAccess else { return [] }
         return eventStore().calendars(for: .event).map {
-            CalendarSource(id: $0.calendarIdentifier, title: $0.title, account: $0.source.title)
+            CalendarSource(id: $0.calendarIdentifier, title: $0.title, account: $0.source.title, colorRGB: Self.rgb($0.cgColor))
         }.sorted { ($0.account, $0.title, $0.id) < ($1.account, $1.title, $1.id) }
     }
 
@@ -46,7 +52,7 @@ private actor CalendarStore {
                                  isAllDay: event.isAllDay,
                                  meetingURL: CalendarEvent.meetingLink(in: [event.url?.absoluteString ?? "", event.location ?? "", event.notes ?? ""]),
                                  calendarID: event.calendar.calendarIdentifier,
-                                 itemIdentifier: event.calendarItemIdentifier, occurrenceDate: event.occurrenceDate)
+                                 itemIdentifier: event.calendarItemIdentifier, occurrenceDate: event.occurrenceDate, calendarColorRGB: Self.rgb(event.calendar.cgColor))
         }
     }
 }
@@ -234,11 +240,12 @@ private extension EKEvent {
         guard demo else { return }
         access = .ready
         now = Date()
+        calendars = [CalendarSource(id: "preview-work", title: String(localized: "Work"), account: "iCloud", colorRGB: 0x1BADF8)]
         events = empty ? [] : [
             CalendarEvent(id: "preview", title: String(localized: "Weekly team sync"), calendarTitle: String(localized: "Work"), start: now.addingTimeInterval(480),
-                          end: now.addingTimeInterval(2280), meetingURL: URL(string: "https://meet.google.com/abc-defg-hij")),
+                          end: now.addingTimeInterval(2280), meetingURL: URL(string: "https://meet.google.com/abc-defg-hij"), calendarColorRGB: 0x1BADF8),
             CalendarEvent(id: "preview-2", title: String(localized: "Design review"), calendarTitle: String(localized: "Work"),
-                          start: now.addingTimeInterval(7200), end: now.addingTimeInterval(10800))
+                          start: now.addingTimeInterval(7200), end: now.addingTimeInterval(10800), calendarColorRGB: 0x1BADF8)
         ]
         reminderEvents = reminder ? Array(events.prefix(1)) : []
     }

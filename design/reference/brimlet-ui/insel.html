@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brimlet · Insel – Prototyp und Zustände</title>
+<link rel="icon" href="assets/brimlet-32.png">
+<link rel="stylesheet" href="brimlet.css">
+<link rel="stylesheet" href="board.css">
+<style>
+.live-wrap { position: relative; margin-top: 20px; }
+.live-desk { position: relative; }
+.live-overlay { position: absolute; z-index: 5; }
+.live-quote { right: 24px; top: 50%; transition: transform 450ms var(--ease-smooth), opacity 450ms var(--ease-smooth); }
+.live-quote.is-out { transform: translate(72px, -50%); opacity: 0; pointer-events: none; }
+.live-quote.is-in { transform: translate(0, -50%); opacity: 1; }
+.reduce-motion .live-quote { transition: opacity 150ms linear; }
+.live-sheet { left: 50%; transform: translateX(-50%); }
+.toast { position: absolute; left: 50%; bottom: 16px; z-index: 6; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(30, 30, 32, .86); color: #fff; font: 400 13px/20px var(--font-text); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); white-space: nowrap; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; font: 400 13px/18px var(--font-text); color: var(--b-ink-2); }
+.legend b { color: var(--b-ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="b-top"><div class="b-top-in"><a class="b-brand" href="index.html"><img src="assets/brimlet-256.png" alt="" width="26" height="26">Brimlet <span>UI-Redesign</span></a>
+<nav class="b-pages" aria-label="Seiten"><a href="index.html">Übersicht</a><a href="insel.html" aria-current="page">Insel</a><a href="einstellungen.html">Einstellungen</a><a href="system.html">Designsystem</a><a href="zuordnung.html">Zuordnung</a></nav></div></header>
+
+<main class="board" data-od-id="island-board">
+  <p class="b-eyebrow">Insel an der Notch · immer schwarz · echte pt-Maße (1 CSS-px = 1 pt)</p>
+  <h1 class="b-h1">Die Insel</h1>
+  <p class="b-lead">Die Insel ist der Graphit-Balken des Logos: schwarz, matt, mit einer feinen Kante. Mint taucht nur dort auf, wo etwas läuft oder wo die eine Hauptaktion liegt. Geometrie, Prioritäten und Verhalten bleiben wie heute.</p>
+  <div class="b-specs">
+    <div class="b-spec"><b>Notch + 108 pt</b><span>Kompakt mit Notch</span></div>
+    <div class="b-spec"><b>218 × 36 pt</b><span>Kapsel, 8 pt unter der Oberkante</span></div>
+    <div class="b-spec"><b>432 pt</b><span>Aufgeklappt (Breite)</span></div>
+    <div class="b-spec"><b>Kopf + 236 pt</b><span>Inhalt, Songtexte + 164 pt</span></div>
+    <div class="b-spec"><b>+ 66 pt</b><span>Peek unter dem Kopf</span></div>
+  </div>
+  <nav class="b-jump" aria-label="Abschnitte"><a href="#live">Live-Prototyp</a><a href="#kompakt">Kompakt</a><a href="#peek">Peek</a><a href="#musik">Musik</a><a href="#timer">Timer</a><a href="#kalender">Kalender</a><a href="#aufgaben">Aufgaben</a><a href="#cmux">cmux &amp; leer</a><a href="#zitat">Zitatkarte</a><a href="#kapsel">Ohne Notch</a><a href="#verhalten">Verhalten</a></nav>
+
+  <section class="b-section" id="live" aria-labelledby="live-h" data-od-id="live-prototype">
+    <h2 class="b-title" id="live-h"><span class="b-num">1</span>Live-Prototyp</h2>
+    <p class="b-note">Zeig auf die Insel oder klick den Kopf. <kbd>Esc</kbd> oder ein Klick daneben schließt sie, das Verlassen schließt nach 0,6 s. Tabs, Wiedergabe, Songtexte, Timer, Kalenderbereich und Aufgaben funktionieren. Im Peek öffnen die Wiedergabetasten die Insel nicht, nur die linke Fläche mit Cover und Titel.</p>
+    <div class="proto" role="group" aria-labelledby="proto-h" data-od-id="proto-controls">
+      <div class="proto-h"><b id="proto-h">Nur Prototyp</b><span>Diese Steuerung gehört nicht zur App. Sie simuliert Ereignisse und Zustände.</span></div>
+      <div class="proto-grid">
+        <div class="proto-g"><label>Display</label><button class="pbtn" data-p="notch" data-v="1" aria-pressed="true">Mit Notch</button><button class="pbtn" data-p="notch" data-v="0" aria-pressed="false">Ohne Notch</button></div>
+        <div class="proto-g"><label>Sprache</label><button class="pbtn" data-p="lang" data-v="en" aria-pressed="true">EN</button><button class="pbtn" data-p="lang" data-v="tr" aria-pressed="false">TR</button></div>
+        <div class="proto-g"><label>Schreibtisch</label><button class="pbtn" data-p="dark" data-v="0" aria-pressed="true">Hell</button><button class="pbtn" data-p="dark" data-v="1" aria-pressed="false">Dunkel</button></div>
+        <div class="proto-g"><label>Ereignis</label><button class="pbtn" data-e="track">Trackwechsel</button><button class="pbtn" data-e="reminder">Termin in 5 min</button><button class="pbtn" data-e="timer">Timer fertig</button><button class="pbtn" data-e="external">Fremde App</button><button class="pbtn" data-e="cmux">cmux wartet</button><button class="pbtn" data-e="quote">Zitat zeigen</button><button class="pbtn" data-e="capture">Text als Zitat</button></div>
+        <div class="proto-g"><label for="p-spot">Spotify</label><select class="psel" id="p-spot"><option value="playing">Spielt</option><option value="paused">Pausiert</option><option value="notConnected">Nicht verbunden</option><option value="waiting">Wartet auf Spotify</option><option value="connected">Verbunden, nichts läuft</option><option value="denied">Keine Berechtigung</option><option value="failed">Fehler</option></select></div>
+        <div class="proto-g"><label for="p-cal">Kalender</label><select class="psel" id="p-cal"><option value="ready">Zugriff erteilt</option><option value="empty">Keine Termine</option><option value="loading">Lädt</option><option value="notRequested">Nicht angefragt</option><option value="requesting">Wartet auf Freigabe</option><option value="denied">Abgelehnt</option></select></div>
+        <div class="proto-g"><label>Optionen</label><button class="pbtn" data-p="hover" aria-pressed="true">Öffnen beim Zeigen</button><button class="pbtn" data-p="fast" aria-pressed="false">Timer im Zeitraffer</button><button class="pbtn" data-p="motion" aria-pressed="false">Bewegung reduzieren</button><button class="pbtn" data-p="nomods" aria-pressed="false">Keine Module</button></div>
+      </div>
+      <p class="proto-log" id="log" role="status" aria-live="polite">Bereit. Zeig auf die Insel.</p>
+    </div>
+    <div class="scroll-x live-wrap"><div id="livedesk" class="live-desk" data-od-id="live-desk"></div></div>
+    <div class="legend"><span><b>Mint</b> = läuft gerade oder Hauptaktion</span><span><b>Weiß</b> = Information</span><span><b>Grau</b> = Ruhe, Nebensache</span></div>
+  </section>
+
+  <section class="b-section" id="kompakt" aria-labelledby="k-h"><h2 class="b-title" id="k-h"><span class="b-num">2</span>Kompakt an der Notch</h2>
+    <p class="b-note">Links Cover oder Modulsymbol, rechts der Status. Hinter der Kamera (184 pt bei diesem Gerät) liegt nichts. Mint nur für Laufendes: spielende Musik, laufender Timer, Termin „Jetzt“. Ein bevorstehender Termin ist Information und bleibt weiß.</p>
+    <div class="gal" id="g-compact"></div></section>
+
+  <section class="b-section" id="peek" aria-labelledby="p-h"><h2 class="b-title" id="p-h"><span class="b-num">3</span>Peek</h2>
+    <p class="b-note">66 pt unter dem Kopf, 432 pt breit. Die linke Fläche öffnet die Insel und zeigt beim Zeigen einen Hover-Hintergrund. Die Tasten rechts sind eigene Ziele mit eigenem Hover und lösen nie das Aufklappen aus. Bleibt der Zeiger auf dem Peek, bleibt er stehen (wie heute).</p>
+    <div class="gal" id="g-peek"></div></section>
+
+  <section class="b-section" id="musik" aria-labelledby="m-h"><h2 class="b-title" id="m-h"><span class="b-num">4</span>Musik und Songtexte</h2>
+    <p class="b-note">Die runde Mint-Taste ist der Tropfen aus dem Logo und die einzige gefüllte Aktion. Fortschritt ist weiß, nicht mint, damit der Akzent nicht dreimal im Bild steht. Das „SPOTIFY“-Etikett in Versalien wird zu einer ruhigen Quellzeile.</p>
+    <div class="gal" id="g-music"></div>
+    <h3 class="b-sub">Verbindungszustände</h3>
+    <p class="b-note">Ein Muster für alle leeren und gesperrten Zustände: Symbol in Grau, Titel 13 pt, Erklärung 12 pt, eine Hauptaktion, bei Bedarf eine Textaktion darunter.</p>
+    <div class="gal" id="g-music-states"></div></section>
+
+  <section class="b-section" id="timer" aria-labelledby="t-h"><h2 class="b-title" id="t-h"><span class="b-num">5</span>Timer</h2>
+    <p class="b-note">5, 15, 25 oder 45 Minuten als Segmentsteuerung statt vier Pillen. Ziffern in SF Pro Light 34 pt mit Tabellenziffern. Laufend ist „Pause“ neutral, weil der Ring den Fortschritt in Mint zeigt; pausiert wird der Ring grau und „Fortsetzen“ zur Hauptaktion.</p>
+    <div class="gal" id="g-timer"></div></section>
+
+  <section class="b-section" id="kalender" aria-labelledby="c-h"><h2 class="b-title" id="c-h"><span class="b-num">6</span>Kalender</h2>
+    <p class="b-note">Zwei Zeilen pro Termin: Titel, darunter Zeitpunkt · Uhrzeit · Kalender mit seiner Kalenderfarbe. „Beitreten“ ist nur dann mint, wenn der Termin in höchstens 10 Minuten beginnt oder läuft, sonst neutral. So steht nie mehr als eine Hauptaktion im Bild.</p>
+    <div class="gal" id="g-cal"></div>
+    <h3 class="b-sub">Zugriff, Laden, Leer, Fehler</h3>
+    <div class="gal" id="g-cal-states"></div></section>
+
+  <section class="b-section" id="aufgaben" aria-labelledby="a-h"><h2 class="b-title" id="a-h"><span class="b-num">7</span>Aufgaben</h2>
+    <p class="b-note">Die Überschrift „Tasks“ entfällt, der Tab nennt das Modul schon. Kategorien als Segmentsteuerung, rechts „Erledigte“ (Umschalter) und die Plus-Taste als einzige Mint-Fläche. „Rückgängig“ erscheint 8 s als Hinweis unten statt als kleiner Link oben.</p>
+    <div class="gal" id="g-todo"></div>
+    <h3 class="b-sub">Aufgabe hinzufügen</h3>
+    <p class="b-note">Bleibt ein Sheet von 360 pt Breite, folgt aber jetzt dem Systemerscheinungsbild. Kategorie als Segmentsteuerung statt Popup, Datum und Erinnerung erscheinen erst nach „Datum hinzufügen“. „Hinzufügen“ ist erst mit Titel aktiv, <kbd>↩</kbd> löst es aus, <kbd>Esc</kbd> bricht ab.</p>
+    <div class="gal" id="g-sheet"></div></section>
+
+  <section class="b-section" id="cmux" aria-labelledby="x-h"><h2 class="b-title" id="x-h"><span class="b-num">8</span>cmux und leere Insel</h2>
+    <p class="b-note">Wartende cmux-Sitzungen erscheinen als Zahl am Cover, als Chip rechts in der Tableiste und als Liste. Die Liste ersetzt den Modulinhalt, bis man einen Tab wählt.</p>
+    <div class="gal" id="g-cmux"></div></section>
+
+  <section class="b-section" id="zitat" aria-labelledby="q-h"><h2 class="b-title" id="q-h"><span class="b-num">9</span>Zitatkarte</h2>
+    <p class="b-note">Eigene Karte am rechten Bildschirmrand, höchstens 400 pt breit, vertikal mittig. Sie folgt jetzt dem Systemerscheinungsbild: hell trägt sie die kühle Platte des Logos, dunkel den Graphit. Zitat in New York 17/26 pt. Der Mint-Strich links entfällt; die Quelle steht als Gedankenstrich-Zeile darunter. Solange der Zeiger auf der Karte liegt, läuft die Zeit nicht ab.</p>
+    <div class="gal" id="g-quote"></div>
+    <h3 class="b-sub">Zitat speichern (macOS-Dienste)</h3>
+    <p class="b-note">„Sichern“ ist erst aktiv, wenn Text da ist. Nach dem Sichern zeigt dieselbe Karte das gespeicherte Zitat. Ein geplantes Zitat ersetzt eine offene Erfassung nie (wie heute).</p>
+    <div class="gal" id="g-capture"></div></section>
+
+  <section class="b-section" id="kapsel" aria-labelledby="o-h"><h2 class="b-title" id="o-h"><span class="b-num">10</span>Ohne Notch</h2>
+    <p class="b-note">Auf externen Displays bleibt Brimlet eine Kapsel von 218 × 36 pt, 8 pt unter der Oberkante, mit 20 pt oberen Ecken, wenn sie aufklappt. Inhalte sind identisch.</p>
+    <div class="gal" id="g-capsule"></div></section>
+
+  <section class="b-section" id="verhalten" aria-labelledby="v-h"><h2 class="b-title" id="v-h"><span class="b-num">11</span>Verhalten und Bewegung</h2>
+    <p class="b-note">Alle Zeiten stammen aus dem heutigen Code und bleiben. Neu ist nur, was die Bewegung zeigt.</p>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Vorgang</th><th>Heute</th><th>Neu</th><th>Reduce Motion</th></tr></thead><tbody>
+      <tr><td>Aufklappen beim Zeigen</td><td class="mut">nach 180 ms, <code>.smooth(0.24)</code></td><td>gleich; Breite und Höhe wachsen nach unten, Oberkante fest</td><td class="mut">ohne Animation</td></tr>
+      <tr><td>Zuklappen beim Verlassen</td><td class="mut">nach 600 ms</td><td>gleich</td><td class="mut">ohne Animation</td></tr>
+      <tr><td>Klick daneben, <kbd>Esc</kbd></td><td class="mut">sofort</td><td>gleich</td><td class="mut">—</td></tr>
+      <tr><td>Peek erscheint</td><td class="mut"><code>.smooth(0.24)</code>, Überblenden</td><td>gleich; Inhalt blendet 120 ms nach dem Wachsen ein</td><td class="mut">nur Überblenden 150 ms</td></tr>
+      <tr><td>Peek-Dauer</td><td class="mut">Trackwechsel 3 s, Timer 6 s, Termin 10 s, fremde App laut Nachricht (1–30 s), cmux 8 s</td><td>gleich; Zeiger auf dem Peek hält ihn, außer bei fremden Apps</td><td class="mut">—</td></tr>
+      <tr><td>Tabwechsel</td><td class="mut"><code>.easeInOut(0.18)</code></td><td>Überblenden 180 ms, keine Verschiebung</td><td class="mut">sofort</td></tr>
+      <tr><td>Songtexte</td><td class="mut">von oben einschieben</td><td>Höhe wächst um 164 pt, Text blendet ein; aktive Zeile wechselt in 180 ms</td><td class="mut">sofort</td></tr>
+      <tr><td>Equalizer</td><td class="mut">12 fps, steht bei Reduce Motion</td><td>gleich, in Mint nur während der Wiedergabe</td><td class="mut">steht still</td></tr>
+      <tr><td>Zitatkarte</td><td class="mut">rein 0,7 s, raus 0,45 s, 72/90 pt Versatz</td><td>rein 0,45 s, raus 0,3 s, 24 pt Versatz: ruhiger, gleiche Richtung</td><td class="mut">Überblenden 150 ms</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <p class="b-foot">Beispielinhalte (Titel „Slow Tide“, Songtext, Termine, Zitat, Benachrichtigung „Time to stretch“) stammen aus Brimlets eigenem Vorschaumodus; Aufgaben und cmux-Projekte sind Beispiele. Symbole sind SVG-Nachbildungen der SF Symbols; in der App werden die echten Symbole verwendet. Hintergrund: Sonoma-Hintergrundbild, nur für interne Mockups.</p>
+  <noscript><p class="b-foot">Die Insel wird mit JavaScript gezeichnet. Bitte JavaScript einschalten.</p></noscript>
+</main>
+
+<script src="ui.js"></script>
+<script>
+(() => {
+'use strict';
+const B = window.BUI;
+const D = B.DATA;
+const $ = (s, r = document) => r.querySelector(s);
+
+const base = { lang: 'en', notch: true, music: { conn: 'playing', elapsed: 92 }, timer: { phase: 'idle', sel: 25 }, cal: { access: 'ready', range: 'today' } };
+const st = (o) => ({ ...base, ...o, music: { ...base.music, ...(o.music || {}) } });
+function fig(container, s, cap, opts = {}) {
+  const el = document.createElement('figure');
+  el.className = 'fig';
+  const w = opts.width || 520;
+  el.innerHTML = `<div class="scroll-x" inert>${B.desk({ ...s, noAnim: true }, { width: w, dark: opts.dark, bare: true })}</div><figcaption class="fig-cap">${cap}</figcaption>`;
+  container.appendChild(el);
+}
+function plain(container, html, cap, cls = 'stage') {
+  const el = document.createElement('figure');
+  el.className = 'fig';
+  el.innerHTML = `<div class="${cls}" inert>${html}</div><figcaption class="fig-cap">${cap}</figcaption>`;
+  container.appendChild(el);
+}
+
+const G = (id) => document.getElementById(id);
+fig(G('g-compact'), st({ mode: 'compact', module: 'music' }), '<b>Musik spielt.</b> Cover links, Equalizer in Mint.', { width: 420 });
+fig(G('g-compact'), st({ mode: 'compact', module: 'music', music: { conn: 'paused' } }), '<b>Musik pausiert.</b> Equalizer steht, grau.', { width: 420 });
+fig(G('g-compact'), st({ mode: 'compact', module: 'timer', timer: { phase: 'running', remaining: 1453, total: 1500 } }), '<b>Timer läuft.</b> Restzeit in Mint, 12 pt Tabellenziffern.', { width: 420 });
+fig(G('g-compact'), st({ mode: 'compact', module: 'timer', timer: { phase: 'paused', remaining: 912, total: 1500 } }), '<b>Timer pausiert.</b> Restzeit grau.', { width: 420 });
+fig(G('g-compact'), st({ mode: 'compact', module: 'calendar', cal: { access: 'ready', compact: 'in8' } }), '<b>Termin in 8 min.</b> Information: weiß.', { width: 420 });
+fig(G('g-compact'), st({ mode: 'compact', module: 'calendar', cal: { access: 'ready', compact: 'now' } }), '<b>Termin läuft.</b> „Jetzt“ in Mint.', { width: 420 });
+fig(G('g-compact'), st({ mode: 'compact', module: 'music', cmux: { sessions: D.sessions } }), '<b>cmux wartet.</b> Zahl am Cover, Mint mit dunkler Ziffer.', { width: 420 });
+fig(G('g-compact'), st({ mode: 'compact', module: null, music: { conn: 'notConnected' } }), '<b>Nichts aktiv.</b> Modulsymbol in Grau.', { width: 420 });
+
+fig(G('g-peek'), st({ mode: 'peek', module: 'music', peek: { kind: 'music' } }), '<b>Trackwechsel, spielt.</b> Steuerung rechts, Mint-Tropfen für Pause.');
+fig(G('g-peek'), st({ mode: 'peek', module: 'music', peek: { kind: 'music', hover: true } }), '<b>Zeiger auf der linken Fläche.</b> Hover-Fläche zeigt: hier öffnet sich die Insel.');
+fig(G('g-peek'), st({ mode: 'peek', module: 'music', music: { conn: 'paused', pending: true }, peek: { kind: 'music' } }), '<b>Befehl unterwegs.</b> Tasten 45 % und gesperrt, bis Spotify antwortet.');
+fig(G('g-peek'), st({ mode: 'peek', module: 'calendar', cal: { access: 'ready', compact: 'in8' }, peek: { kind: 'calendar' } }), '<b>Termin-Erinnerung.</b> 10 s, „Beitreten“ als einzige Hauptaktion.');
+fig(G('g-peek'), st({ mode: 'peek', module: 'timer', timer: { phase: 'finished' }, peek: { kind: 'timer' } }), '<b>Timer fertig.</b> 6 s, mit Ton, wenn eingeschaltet.');
+fig(G('g-peek'), st({ mode: 'peek', module: 'music', peek: { kind: 'external' } }), '<b>Fremde App.</b> Symbol aus der Nachricht, zwei Zeilen Text. Klick schließt.');
+fig(G('g-peek'), st({ mode: 'peek', module: 'music', cmux: { sessions: D.sessions }, peek: { kind: 'cmux' } }), '<b>cmux-Sitzung wartet.</b> „+1“ zeigt weitere Sitzungen.');
+
+fig(G('g-music'), st({ mode: 'expanded', module: 'music' }), '<b>Spielt.</b> 432 × 274 pt (Kopf 38 + 236).');
+fig(G('g-music'), st({ mode: 'expanded', module: 'music', music: { conn: 'playing', lyrics: 'synced', line: 1, seekHover: true } }), '<b>Synchroner Songtext.</b> + 164 pt, aktive Zeile 13 pt halbfett. Zeiger auf der Zeitleiste: Knopf wächst.');
+fig(G('g-music'), st({ mode: 'expanded', module: 'music', music: { conn: 'paused', lyrics: 'plain' } }), '<b>Pausiert, Text ohne Zeitmarken.</b> Etikett „Plain“, keine hervorgehobene Zeile.');
+fig(G('g-music'), st({ mode: 'expanded', module: 'music', music: { conn: 'playing', lyrics: 'loading' } }), '<b>Songtext wird gesucht.</b> LRCLIB, nur solange geöffnet.');
+fig(G('g-music'), st({ mode: 'expanded', module: 'music', music: { conn: 'playing', lyrics: 'none' } }), '<b>Kein Songtext gefunden.</b>');
+fig(G('g-music'), st({ mode: 'expanded', module: 'music', music: { conn: 'playing', pending: true } }), '<b>Befehl unterwegs.</b> Tasten und Zeitleiste gesperrt.');
+for (const [conn, cap] of [['notConnected', '<b>Nicht verbunden.</b> Erster Start.'], ['waiting', '<b>Spotify noch nicht bereit.</b>'], ['connected', '<b>Verbunden, nichts läuft.</b>'], ['denied', '<b>Berechtigung fehlt.</b> Hauptaktion öffnet die Systemeinstellungen, die Textaktion versucht es erneut.'], ['failed', '<b>Fehler.</b> Meldung aus Spotify, „Erneut versuchen“.']]) fig(G('g-music-states'), st({ mode: 'expanded', module: 'music', music: { conn } }), cap);
+
+fig(G('g-timer'), st({ mode: 'expanded', module: 'timer', timer: { phase: 'idle', sel: 25 } }), '<b>Bereit.</b> 25 min gewählt, „Timer starten“ in Mint.');
+fig(G('g-timer'), st({ mode: 'expanded', module: 'timer', timer: { phase: 'running', remaining: 1312, total: 1500 } }), '<b>Läuft.</b> Ring in Mint, Punkt am Tab, „Pause“ neutral.');
+fig(G('g-timer'), st({ mode: 'expanded', module: 'timer', timer: { phase: 'paused', remaining: 912, total: 1500 } }), '<b>Pausiert.</b> Ring grau, „Fortsetzen“ als Hauptaktion.');
+fig(G('g-timer'), st({ mode: 'expanded', module: 'timer', timer: { phase: 'finished' } }), '<b>Abgelaufen.</b> Ring voll, Haken in Mint.');
+
+fig(G('g-cal'), st({ mode: 'expanded', module: 'calendar' }), '<b>Heute.</b> „Beitreten“ in Mint beim Termin in 8 min, neutral beim Termin in 2 h.');
+fig(G('g-cal'), st({ mode: 'expanded', module: 'calendar', cal: { access: 'ready', range: 'tomorrow' } }), '<b>Morgen.</b> Langer Titel bricht auf zwei Zeilen um.');
+fig(G('g-cal'), st({ mode: 'expanded', module: 'calendar', cal: { access: 'ready', range: 'week' } }), '<b>7 Tage.</b> Der Tag steht vor der Uhrzeit.');
+fig(G('g-cal'), st({ mode: 'expanded', module: 'calendar', cal: { access: 'ready', events: [{ ...D.events.today[0], st: ['now'] }, { ...D.events.today[1], st: ['ended'] }] } }), '<b>Läuft gerade und beendet.</b> „Läuft“ in Mint, Beendetes in Grau statt mit 55 % Deckkraft.');
+for (const [c, cap] of [[{ access: 'ready', loading: true }, '<b>Lädt.</b> Nur wenn noch keine Termine da sind.'], [{ access: 'ready', empty: true }, '<b>Keine Termine im Bereich.</b>'], [{ access: 'ready', error: true }, '<b>Link ließ sich nicht öffnen.</b> Hinweis über der Liste.'], [{ access: 'notRequested' }, '<b>Nicht angefragt.</b>'], [{ access: 'requesting' }, '<b>Wartet auf macOS.</b>'], [{ access: 'denied' }, '<b>Abgelehnt.</b>'], [{ access: 'restricted' }, '<b>Eingeschränkt.</b> Ohne Aktion, weil sich nichts tun lässt.']]) fig(G('g-cal-states'), st({ mode: 'expanded', module: 'calendar', cal: c }), cap);
+
+fig(G('g-todo'), st({ mode: 'expanded', module: 'todos' }), '<b>Offene Aufgaben.</b> Fällige zuerst, Glocke = Erinnerung um 9:00.');
+fig(G('g-todo'), st({ mode: 'expanded', module: 'todos', todos: { filter: 'personal' } }), '<b>Gefiltert: Persönlich.</b> Notiz in der Metazeile.');
+fig(G('g-todo'), st({ mode: 'expanded', module: 'todos', todos: { undo: 'Pay the electricity bill', items: D.tasks.filter((x) => x.id !== 't2') } }), '<b>Gerade erledigt.</b> Hinweis mit „Rückgängig“ für 8 s.');
+fig(G('g-todo'), st({ mode: 'expanded', module: 'todos', todos: { showCompleted: true } }), '<b>Erledigte.</b> Durchgestrichen, Löschen pro Zeile, Plus gesperrt.');
+fig(G('g-todo'), st({ mode: 'expanded', module: 'todos', todos: { items: [] } }), '<b>Leer.</b>');
+plain(G('g-sheet'), B.taskSheet({ lang: 'en', theme: 'light', focus: true }), '<b>Leer, hell.</b> „Hinzufügen“ gesperrt, Fokus im Titel.');
+plain(G('g-sheet'), B.taskSheet({ lang: 'en', theme: 'dark', title: 'Pay the electricity bill', note: 'Online banking', hasDate: true, remind: true }), '<b>Ausgefüllt, dunkel.</b> Mit Datum und Erinnerung.', 'stage is-black');
+plain(G('g-sheet'), B.taskSheet({ lang: 'tr', theme: 'light', title: 'Elektrik faturasını öde', cat: 'personal', hasDate: true }), '<b>Türkisch.</b> Längste Beschriftung passt in eine Zeile.');
+
+fig(G('g-cmux'), st({ mode: 'expanded', module: 'music', cmux: { sessions: D.sessions, queue: true } }), '<b>Wartende Sitzungen.</b> Zeile öffnet die Sitzung in cmux.');
+fig(G('g-cmux'), st({ mode: 'expanded', module: 'music', cmux: { sessions: [], queue: true } }), '<b>Keine wartet.</b>');
+fig(G('g-cmux'), st({ mode: 'expanded', module: null, modules: [] }), '<b>Kein Modul eingeschaltet.</b> Führt in die Einstellungen.');
+
+plain(G('g-quote'), B.quote({ lang: 'en', theme: 'light' }), '<b>Hell.</b> Kühle Platte, Graphit-Schrift, Jade für das Etikett.', 'stage is-wall');
+plain(G('g-quote'), B.quote({ lang: 'en', theme: 'dark' }), '<b>Dunkel.</b> Graphit #1A1E24, Mint-Etikett.', 'stage is-wall-dark');
+plain(G('g-quote'), B.quote({ lang: 'tr', theme: 'light', quote: D.quotes[1], secs: 0 }), '<b>Kurz, ohne Autor, „bis ich schließe“.</b> Türkisch.', 'stage is-wall');
+plain(G('g-quote'), B.quote({ lang: 'en', theme: 'dark', quote: { text: Array(3).fill(D.quote.text).join(' '), author: 'Henry David Thoreau', source: 'Walden' }, maxH: 260 }), '<b>Lang.</b> Höhe 90–480 pt, darüber scrollt der Text.', 'stage is-wall-dark');
+plain(G('g-capture'), B.quote({ lang: 'en', theme: 'light', capture: true, text: '' }), '<b>Leer.</b> „Sichern“ gesperrt.', 'stage is-wall');
+plain(G('g-capture'), B.quote({ lang: 'en', theme: 'dark', capture: true, author: 'Henry David Thoreau', source: 'Walden' }), '<b>Aus einer Auswahl, mit Quelle.</b>', 'stage is-wall-dark');
+plain(G('g-capture'), B.quote({ lang: 'tr', theme: 'light', capture: true }), '<b>Türkisch.</b>', 'stage is-wall');
+
+fig(G('g-capsule'), st({ notch: false, mode: 'compact', module: 'music' }), '<b>Kompakt.</b> 218 × 36 pt, 8 pt unter der Oberkante.', { width: 420 });
+fig(G('g-capsule'), st({ notch: false, mode: 'peek', module: 'music', peek: { kind: 'music' } }), '<b>Peek.</b>');
+fig(G('g-capsule'), st({ notch: false, mode: 'expanded', module: 'timer', timer: { phase: 'running', remaining: 1312, total: 1500 } }), '<b>Aufgeklappt.</b> 432 × 272 pt, obere Ecken 20 pt.');
+
+const S = { lang: 'en', notch: true, dark: false, mode: 'compact', sel: null, music: { conn: 'playing', elapsed: 92, lyrics: null, line: 1, pending: false }, timer: { phase: 'idle', sel: 25, remaining: 1500, total: 1500 }, cal: { access: 'ready', range: 'today' }, todos: { filter: null, showCompleted: false, items: D.tasks.slice(), done: D.done.slice(), undo: null }, cmux: { sessions: [], queue: false }, peek: null, modules: ['music', 'timer', 'calendar', 'todos'], hoverExpand: true, fast: false, reduceMotion: false, sheet: null, quote: null, inside: false };
+let hoverT = null, peekT = null, undoT = null, quoteT = null;
+const live = $('#livedesk');
+const log = (m) => { $('#log').textContent = m; };
+
+function current() {
+  const mods = S.modules;
+  if (S.mode === 'expanded' && S.sel && mods.includes(S.sel)) return S.sel;
+  if (S.peek && S.peek.module && mods.includes(S.peek.module)) return S.peek.module;
+  if (mods.includes('music') && S.music.conn === 'playing') return 'music';
+  if (mods.includes('timer') && (S.timer.phase === 'running' || S.timer.phase === 'paused')) return 'timer';
+  return mods[0] || null;
+}
+function state() {
+  const m = current();
+  const lyr = m === 'music' && S.music.lyrics && S.mode === 'expanded' ? S.music.lyrics : null;
+  return { lang: S.lang, notch: S.notch, mode: S.mode, module: m, modules: S.modules, music: { ...S.music, lyrics: lyr }, timer: S.timer, cal: { ...S.cal, access: S.cal.access === 'empty' || S.cal.access === 'loading' ? 'ready' : S.cal.access, empty: S.cal.access === 'empty', loading: S.cal.access === 'loading', compact: S.peek && S.peek.kind === 'calendar' ? 'in8' : 'in8' }, todos: S.todos, cmux: S.cmux, peek: S.peek, reduceMotion: S.reduceMotion, interactive: true };
+}
+let shellKey = '', deskEl = null, stageEl = null, sheetEl = null, quoteEl = null;
+function shell(s) {
+  const key = [S.notch, S.lang, S.dark].join('|');
+  if (key === shellKey && deskEl) return;
+  shellKey = key;
+  live.innerHTML = B.desk(s, { width: 1240, height: 560, dark: S.dark });
+  deskEl = live.firstElementChild;
+  stageEl = deskEl.querySelector('.desk-stage');
+  sheetEl = document.createElement('div'); sheetEl.className = 'live-overlay live-sheet'; deskEl.appendChild(sheetEl);
+  quoteEl = document.createElement('div'); quoteEl.className = 'live-overlay live-quote is-out'; deskEl.appendChild(quoteEl);
+  renderSheet(); renderQuote(true);
+}
+function renderIsland() {
+  const a = document.activeElement;
+  const key = a && a.closest && a.closest('#livedesk .isl') && a.dataset.act ? [a.dataset.act, a.dataset.v || ''] : null;
+  const s = state();
+  shell(s);
+  stageEl.innerHTML = B.island(s);
+  document.documentElement.classList.toggle('reduce-motion', S.reduceMotion);
+  const isl = stageEl.firstElementChild;
+  sheetEl.style.top = (isl.offsetTop + isl.offsetHeight + 10) + 'px';
+  if (key) {
+    const el = stageEl.querySelector(`[data-act="${key[0]}"]${key[1] ? `[data-v="${key[1]}"]` : ''}`);
+    if (el) el.focus({ preventScroll: true });
+  }
+}
+function renderSheet() {
+  if (!sheetEl) return;
+  sheetEl.innerHTML = S.sheet ? B.taskSheet({ ...S.sheet, lang: S.lang, theme: S.dark ? 'dark' : 'light', interactive: true }) : '';
+}
+function renderQuote(content) {
+  if (!quoteEl) return;
+  if (content) quoteEl.innerHTML = S.quote ? B.quote({ ...S.quote, lang: S.lang, theme: S.dark ? 'dark' : 'light', interactive: true, secs: 30 }) : '';
+  quoteEl.classList.toggle('is-in', !!(S.quote && S.quote.shown));
+  quoteEl.classList.toggle('is-out', !(S.quote && S.quote.shown));
+}
+function render() { renderIsland(); renderSheet(); }
+function expand(module) {
+  clearTimeout(hoverT); clearTimeout(peekT);
+  const m = module || current();
+  S.peek = null; S.mode = 'expanded'; S.sel = m;
+  render(); log('Aufgeklappt.');
+}
+function collapse(why) {
+  if (S.sheet) return;
+  clearTimeout(hoverT); clearTimeout(peekT);
+  if (S.mode === 'compact') return;
+  S.mode = 'compact'; S.peek = null; S.sel = null; S.cmux.queue = false;
+  render(); log(why || 'Zugeklappt.');
+}
+function alert(kind, secs) {
+  if (S.mode === 'expanded') { log('Aufgeklappt: Hinweise erscheinen erst im kleinen Zustand.'); return; }
+  const module = { track: 'music', reminder: 'calendar', timer: 'timer' }[kind] || null;
+  const peekKind = { track: 'music', reminder: 'calendar', timer: 'timer', external: 'external', cmux: 'cmux' }[kind];
+  S.peek = { kind: peekKind, module, sticky: kind !== 'external' };
+  S.mode = 'peek';
+  render();
+  clearTimeout(peekT);
+  const end = () => { if (S.inside && S.peek && S.peek.sticky) { peekT = setTimeout(end, 300); return; } if (S.mode === 'peek') { S.mode = 'compact'; S.peek = null; render(); log('Peek beendet.'); } };
+  peekT = setTimeout(end, secs * 1000);
+}
+function setInside(inside) {
+  if (inside === S.inside) return;
+  S.inside = inside;
+  clearTimeout(hoverT);
+  if (S.sheet) return;
+  if (inside) {
+    if (S.mode === 'peek') return;
+    if (S.mode === 'compact' && S.hoverExpand) hoverT = setTimeout(() => expand(), 180);
+  } else if (S.mode === 'peek' && S.peek && S.peek.sticky) {
+    clearTimeout(peekT); peekT = setTimeout(() => { if (!S.inside && S.mode === 'peek') { S.mode = 'compact'; S.peek = null; render(); } }, 1000);
+  } else if (S.mode === 'expanded') {
+    hoverT = setTimeout(() => collapse('Zeiger hat die Insel verlassen: nach 0,6 s zugeklappt.'), 600);
+  }
+}
+live.addEventListener('mousemove', (e) => setInside(!!e.target.closest('.isl, .live-sheet')));
+live.addEventListener('mouseleave', () => setInside(false));
+
+live.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const a = el.dataset.act, v = el.dataset.v;
+  e.stopPropagation();
+  switch (a) {
+    case 'head': S.mode === 'expanded' ? collapse() : expand(); break;
+    case 'expand': expand(S.peek && S.peek.module); break;
+    case 'tab': S.cmux.queue = false; S.sel = v; render(); break;
+    case 'settings': log('Öffnet die Einstellungen (siehe Seite Einstellungen).'); break;
+    case 'playpause': S.music.conn = S.music.conn === 'playing' ? 'paused' : 'playing'; render(); log(S.mode === 'peek' ? 'Wiedergabe im Peek umgeschaltet, ohne aufzuklappen.' : 'Wiedergabe umgeschaltet.'); break;
+    case 'lyrics': S.music.lyrics = S.music.lyrics ? null : 'synced'; render(); break;
+    case 'peeklyrics': S.music.lyrics = 'synced'; expand('music'); break;
+    case 'seek': { const r = el.getBoundingClientRect(); S.music.elapsed = Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * D.track.duration); render(); break; }
+    case 'connect': S.music.conn = 'playing'; render(); log('Mit Spotify verbunden (simuliert).'); break;
+    case 'tsel': S.timer.sel = +v; S.timer.remaining = S.timer.total = +v * 60; render(); break;
+    case 'tstart': S.timer.phase = 'running'; S.timer.total = S.timer.remaining = S.timer.sel * 60; render(); break;
+    case 'tpause': S.timer.phase = S.timer.phase === 'running' ? 'paused' : 'running'; render(); break;
+    case 'treset': S.timer.phase = 'idle'; S.timer.remaining = S.timer.total = S.timer.sel * 60; render(); break;
+    case 'range': S.cal.range = v; render(); break;
+    case 'calconnect': S.cal.access = 'requesting'; render(); setTimeout(() => { S.cal.access = 'ready'; render(); }, 1400); break;
+    case 'filter': S.todos.filter = v || null; render(); break;
+    case 'showdone': S.todos.showCompleted = !S.todos.showCompleted; render(); break;
+    case 'complete': { const i = S.todos.items.findIndex((x) => x.id === v); if (i < 0) break; const [it] = S.todos.items.splice(i, 1); S.todos.done.unshift({ ...it, done: true }); S.todos.undo = S.lang === 'tr' ? it.tr : it.t; S.todos.last = it; render(); clearTimeout(undoT); undoT = setTimeout(() => { S.todos.undo = null; render(); }, 8000); break; }
+    case 'undo': if (S.todos.last) { S.todos.done = S.todos.done.filter((x) => x.id !== S.todos.last.id); S.todos.items.push(S.todos.last); } S.todos.undo = null; render(); break;
+    case 'remove': S.todos.done = S.todos.done.filter((x) => x.id !== v); render(); break;
+    case 'newtask': S.sheet = { title: '', focus: true }; render(); setTimeout(() => { const i = live.querySelector('[data-act="ttitle"]'); i && i.focus(); }, 30); break;
+    case 'tcat': S.sheet.cat = v; render(); break;
+    case 'tdate': S.sheet.hasDate = !S.sheet.hasDate; render(); break;
+    case 'tremind': S.sheet.remind = !S.sheet.remind; render(); break;
+    case 'tcancel': S.sheet = null; render(); break;
+    case 'tadd': S.todos.items.push({ id: 'n' + Date.now(), t: S.sheet.title, tr: S.sheet.title, cat: S.sheet.cat || 'home', due: S.sheet.hasDate ? '28 Oct' : null, dueTr: '28 Eki', bell: !!S.sheet.remind }); S.sheet = null; render(); log('Aufgabe hinzugefügt.'); break;
+    case 'cmuxq': S.cmux.queue = !S.cmux.queue; render(); break;
+    case 'dismiss': clearTimeout(peekT); S.mode = 'compact'; S.peek = null; render(); log('Benachrichtigung per Klick geschlossen.'); break;
+    case 'qclose': if (S.quote) { S.quote.shown = false; renderQuote(false); log('Zitatkarte geschlossen.'); } break;
+    case 'qsave': S.quote = { quote: { text: S.quote.text ?? D.quote.text, author: '', source: '' }, shown: true }; renderQuote(true); log('Zitat gesichert und angezeigt.'); break;
+    default: log('Diese Aktion öffnet in der App ein anderes Fenster oder eine andere App.');
+  }
+});
+live.addEventListener('input', (e) => {
+  const el = e.target;
+  if (el.dataset.act === 'ttitle' && S.sheet) { S.sheet.title = el.value; const add = live.querySelector('[data-act="tadd"]'); if (add) add.disabled = !el.value.trim(); }
+  if (el.dataset.act === 'qtext' && S.quote) { S.quote.text = el.value; const sv = live.querySelector('[data-act="qsave"]'); if (sv) sv.disabled = !el.value.trim(); }
+});
+live.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.dataset.act === 'ttitle' && S.sheet && S.sheet.title.trim()) { e.preventDefault(); live.querySelector('[data-act="tadd"]').click(); }
+  if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && e.target.classList.contains('itab')) {
+    const tabs = [...live.querySelectorAll('.itab')]; const i = tabs.indexOf(e.target);
+    const n = tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length]; n.click(); setTimeout(() => { const f = live.querySelector(`.itab[data-v="${n.dataset.v}"]`); f && f.focus(); }, 0);
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (S.sheet) { S.sheet = null; render(); return; }
+  if (S.quote && S.quote.shown) { S.quote.shown = false; renderQuote(false); return; }
+  if (S.mode !== 'compact') collapse('Mit Esc geschlossen.');
+});
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.proto, #livedesk .isl, #livedesk .live-overlay')) return;
+  if (S.mode === 'expanded') collapse('Klick daneben: sofort geschlossen.');
+});
+
+document.querySelectorAll('.proto [data-p]').forEach((b) => b.addEventListener('click', () => {
+  const p = b.dataset.p;
+  if (p === 'notch' || p === 'lang' || p === 'dark') {
+    S[p] = p === 'lang' ? b.dataset.v : b.dataset.v === '1';
+    document.querySelectorAll(`.proto [data-p="${p}"]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    shellKey = '';
+  } else {
+    const on = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', String(on));
+    if (p === 'hover') S.hoverExpand = on;
+    if (p === 'fast') S.fast = on;
+    if (p === 'motion') S.reduceMotion = on;
+    if (p === 'nomods') S.modules = on ? [] : ['music', 'timer', 'calendar', 'todos'];
+  }
+  render();
+}));
+document.querySelectorAll('.proto [data-e]').forEach((b) => b.addEventListener('click', () => {
+  const e = b.dataset.e;
+  if (e === 'track') { S.music.conn = 'playing'; S.music.elapsed = 0; alert('track', 3); log('Trackwechsel: Peek für 3 s.'); }
+  if (e === 'reminder') { alert('reminder', 10); log('Termin-Erinnerung: Peek für 10 s.'); }
+  if (e === 'timer') { S.timer.phase = 'finished'; alert('timer', 6); log('Timer abgelaufen: Peek für 6 s.'); }
+  if (e === 'external') { alert('external', 6); log('Benachrichtigung einer fremden App, 6 s. Zeigen hält sie nicht.'); }
+  if (e === 'cmux') { S.cmux.sessions = D.sessions.slice(); alert('cmux', 8); log('cmux-Sitzung wartet: Peek für 8 s, Zahl am Cover.'); }
+  if (e === 'quote') { S.quote = { quote: D.quote, shown: false }; renderQuote(true); requestAnimationFrame(() => requestAnimationFrame(() => { S.quote.shown = true; renderQuote(false); })); clearTimeout(quoteT); log('Zitatkarte fährt am rechten Rand herein. Zeiger darauf hält sie, × schließt.'); }
+  if (e === 'capture') { S.quote = { capture: true, text: D.quote.text, shown: false }; renderQuote(true); requestAnimationFrame(() => requestAnimationFrame(() => { S.quote.shown = true; renderQuote(false); })); log('Erfassung über Dienste › Add to Brimlet as Quote.'); }
+}));
+$('#p-spot').addEventListener('change', (e) => { S.music.conn = e.target.value; render(); });
+$('#p-cal').addEventListener('change', (e) => { S.cal.access = e.target.value; render(); });
+
+setInterval(() => {
+  let dirty = false;
+  if (S.music.conn === 'playing') { S.music.elapsed = (S.music.elapsed + 1) % D.track.duration; S.music.line = Math.floor(S.music.elapsed / 4) % 4 + 1; dirty = current() === 'music' && S.mode !== 'compact'; }
+  if (S.timer.phase === 'running') {
+    S.timer.remaining -= S.fast ? 60 : 1; dirty = true;
+    if (S.timer.remaining <= 0) { S.timer.remaining = 0; S.timer.phase = 'finished'; if (S.mode === 'compact') { alert('timer', 6); log('Timer abgelaufen: Peek für 6 s.'); } }
+  }
+  if (dirty) renderIsland();
+}, 1000);
+render();
+})();
+</script>
+</body>
+</html>

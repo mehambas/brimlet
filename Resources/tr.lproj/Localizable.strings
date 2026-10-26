@@ -16,7 +16,6 @@
 "5 minutes before" = "5 dakika önce";
 "7 days" = "7 gün";
 "A little room for your music." = "Müziğine küçük bir alan.";
-"A little room up top." = "Küçük alan. Senin akışın.";
 "A sentence you want to remember." = "Hatırlamak istediğin bir cümle.";
 "A short break or some focus time" = "Kısa bir mola veya odaklanma zamanı";
 "A short sound when the timer ends." = "Zamanlayıcı bittiğinde kısa bir ses duyulur.";
@@ -32,7 +31,6 @@
 "Allow Spotify under Privacy & Security ›\nAutomation › Brimlet." = "Gizlilik ve Güvenlik › Otomasyon › Brimlet\naltında Spotify’a izin ver.";
 "Allow an App…" = "Uygulamaya izin ver…";
 "Allow calendar access to see your upcoming events." = "Yaklaşan etkinliklerini görmek için takvim erişimini aç.";
-"Appearance" = "Görünüm";
 "Apps you allow can show short notifications in Brimlet." = "İzin verdiğin uygulamalar kısa bildirimlerini Brimlet’te gösterebilir.";
 "Automatic · Notched display first" = "Otomatik · Önce çentikli ekran";
 "Book or source" = "Kitap veya kaynak";
@@ -106,7 +104,6 @@
 "Hide Lyrics" = "Sözleri kapat";
 "Hide in full screen" = "Tam ekranda gizle";
 "Home" = "Ev";
-"How Brimlet behaves on your screen." = "Brimlet’in ekrandaki davranışını ayarla.";
 "How often?" = "Ne sıklıkla?";
 "If the display goes away, Brimlet moves to another one. On displays without a notch it shows as a small capsule." = "Ekran çıkarılırsa Brimlet açık olan başka bir ekrana geçer. Çentiksiz ekranlarda küçük bir kapsül olarak görünür.";
 "In progress" = "Devam ediyor";
@@ -116,7 +113,6 @@
 "Join the meeting" = "Toplantıya katıl";
 "Keep music in front" = "Müziği önde tut";
 "Keep track of home, personal and work tasks" = "Ev, kişisel ve iş görevlerini takip et";
-"LYRICS" = "SÖZLER";
 "Last checked: %@" = "Son denetim: %@";
 "Leaves the space empty when an app fills the screen." = "Ekranı kaplayan uygulamalarda alanı boş bırakır.";
 "Let’s reconnect." = "Bağlantıyı yenileyelim.";
@@ -129,7 +125,6 @@
 "Music" = "Müzik";
 "New Task" = "Yeni görev";
 "Next Track" = "Sonraki parça";
-"No account needed." = "Hesap oluşturman gerekmiyor.";
 "No account, no analytics." = "Hesap yok, analitik yok.";
 "No calendar is selected, so no events or reminders are shown." = "Hiçbir takvim seçili değil. Etkinlikler ve hatırlatmalar gösterilmez.";
 "No events in this range" = "Bu aralıkta etkinlik yok";
@@ -170,18 +165,14 @@
 "Play something, and it shows up here." = "Bir parça aç, burada buluşalım.";
 "Playing" = "Çalıyor";
 "Previous Track" = "Önceki parça";
-"Privacy" = "Gizlilik";
 "Quit Brimlet" = "Brimlet’ten çık";
 "Quotes" = "Özlü sözler";
-"Quotes you save show up next to Brimlet, on a calm card of their own." = "Kaydettiklerin Brimlet’in yanında, ayrı ve sakin bir kartta görünür.";
 "Refresh Calendar" = "Takvimi yenile";
 "Release Notes" = "Sürüm notları";
 "Remind me at 9:00 that morning" = "Sabah 09.00’da hatırlat";
 "Remove" = "İzni kaldır";
 "Reset Timer" = "Zamanlayıcıyı sıfırla";
 "Resume" = "Devam et";
-"Right where it belongs." = "Tam yerinde.";
-"SYNCED" = "CANLI";
 "Save" = "Kaydet";
 "Saved quotes · %lld" = "Kayıtlı sözler · %lld";
 "Select some text in a PDF or a web page, Control-click it and choose Services › Add to Brimlet as Quote." = "PDF’te veya tarayıcıda bir metin seçip sağ tıkla; Servisler › Brimlet’e söz olarak ekle yoluyla buraya kaydedebilirsin.";
@@ -197,7 +188,6 @@
 "Show or Hide" = "Göster / Gizle";
 "Show track changes" = "Parça değişimini göster";
 "Shows a short reminder while Brimlet is open and visible. Not for all-day events." = "Brimlet açık ve görünürken kısa bir hatırlatma gösterir. Tüm gün etkinlikleri için gösterilmez.";
-"Simple and local." = "Sade ve yerel.";
 "Spotify didn’t respond (%lld)." = "Spotify yanıt vermedi (%lld).";
 "Spotify isn’t available right now." = "Spotify şu anda kullanılamıyor.";
 "Spotify · The track and playback controls" = "Spotify · Parça ve oynatma kontrolleri";
@@ -233,7 +223,6 @@
 "Track position" = "Parça konumu";
 "Try Again" = "Tekrar dene";
 "Turn on full access in System Settings › Privacy & Security › Calendars." = "Sistem Ayarları › Gizlilik ve Güvenlik › Takvimler bölümünden tam erişimi aç.";
-"Turn on what you need, in the order you like." = "İhtiyacın olanı aç. Sırasını kendin belirle.";
 "Turning off the timer module resets a running timer." = "Zamanlayıcı modülünü kapatmak çalışan süreyi sıfırlar.";
 "Turning on Calendar asks macOS for access. Events are only read; your calendar is never changed." = "Takvim açıldığında macOS erişim izni ister. Etkinlikler yalnızca okunur; takviminde değişiklik yapılmaz.";
 "Undo" = "Geri al";
@@ -242,16 +231,13 @@
 "Untitled event" = "İsimsiz etkinlik";
 "Upcoming events and meeting links" = "Yaklaşan etkinlikler ve toplantı bağlantıları";
 "Update to %@…" = "%@ sürümüne güncelle…";
-"Version %@" = "Sürüm %@";
 "Waiting for calendar access…" = "macOS takvim izni bekleniyor…";
 "Waiting for your next track." = "Sıradaki parçanı bekliyor.";
 "Weekly team sync" = "Haftalık ekip buluşması";
 "What do you need to do?" = "Ne yapman gerekiyor?";
-"What should live up here?" = "Yukarıda neler olsun?";
 "What’s playing and its controls, right here." = "Çalan parçan ve kontrollerin, tam burada.";
 "When several modules have something going on, the higher one wins. In the open panel, the tabs switch between them." = "Birden fazla etkinlik varsa üstteki modül önceliklidir. Açık panelde sekmelerle istediğin modüle geçebilirsin.";
 "Where it’s from is up to you." = "Kaynak bilgisi isteğe bağlı.";
-"Words to keep you company." = "Sözlerin sana eşlik etsin.";
 "Work" = "İş";
 "You can also click it open." = "Kapalıyken tıklayarak da açabilirsin.";
 "You have %@." = "Kullandığın sürüm: %@.";
@@ -266,3 +252,20 @@
 "in %lld h" = "%lld sa sonra";
 "in %lld h %lld min" = "%lld sa %lld dk sonra";
 "in %lld min" = "%lld dk sonra";
+
+"Access" = "Erişim";
+"Calendar is off" = "Takvim kapalı";
+"Calendars" = "Takvimler";
+"Complete %@" = "%@ görevini tamamla";
+"Full access" = "Tam erişim";
+"No apps allowed yet" = "Henüz izin verilen uygulama yok";
+"Not connected" = "Bağlı değil";
+"Notifications" = "Bildirimler";
+"On Screen" = "Ekranda";
+"Plain" = "Düz metin";
+"Small View" = "Küçük görünüm";
+"Starts Brimlet when you log in." = "Oturum açtığında Brimlet’i başlatır.";
+"Synced" = "Eşzamanlı";
+"Turn On" = "Aç";
+"Turn on Music to connect Spotify." = "Spotify’a bağlanmak için Müzik’i aç.";
+"cmux" = "cmux";

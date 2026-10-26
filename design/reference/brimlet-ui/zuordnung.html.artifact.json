@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "brimlet-ui/zuordnung.html",
+  "entry": "brimlet-ui/zuordnung.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-10-26T13:29:17.274Z",
+  "updatedAt": "2026-10-26T13:29:17.274Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brimlet · Einstellungen und Hilfsfenster</title>
+<link rel="icon" href="assets/brimlet-32.png">
+<link rel="stylesheet" href="brimlet.css">
+<link rel="stylesheet" href="board.css">
+<style>
+.live-stage { display: flex; justify-content: center; align-items: flex-start; min-height: 720px; padding: 40px 24px; border-radius: 14px; background: #7d8796 url("assets/wallpaper-sonoma-light.jpg") center / cover; }
+.live-stage.is-dark { background-image: url("assets/wallpaper-sonoma-dark.jpg"); }
+.map { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 18px; margin-top: 16px; align-items: start; }
+.map dt { display: flex; align-items: center; gap: 8px; font: 600 15px/22px var(--font-text); white-space: nowrap; }
+.map dt .sym { width: 18px; height: 18px; color: var(--c-tint); }
+.map dd { font: 400 15px/22px var(--font-text); color: var(--b-ink-2); }
+.pair { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 20px; align-items: flex-start; }
+.wall { display: grid; place-items: start center; padding: 32px; border-radius: 14px; background: #7d8796 url("assets/wallpaper-sonoma-light.jpg") center / cover; max-width: 100%; overflow-x: auto; }
+.wall.is-dark { background-image: url("assets/wallpaper-sonoma-dark.jpg"); background-color: #1f2735; }
+.toast2 { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(30, 30, 32, .86); color: #fff; font: 400 13px/20px var(--font-text); white-space: nowrap; }
+@media (max-width: 760px) { .map { grid-template-columns: minmax(0, 1fr); gap: 2px; } .map dd { margin-bottom: 10px; } }
+</style>
+</head>
+<body>
+<header class="b-top"><div class="b-top-in"><a class="b-brand" href="index.html"><img src="assets/brimlet-256.png" alt="" width="26" height="26">Brimlet <span>UI-Redesign</span></a>
+<nav class="b-pages" aria-label="Seiten"><a href="index.html">Übersicht</a><a href="insel.html">Insel</a><a href="einstellungen.html" aria-current="page">Einstellungen</a><a href="system.html">Designsystem</a><a href="zuordnung.html">Zuordnung</a></nav></div></header>
+
+<main class="board" data-od-id="settings-board">
+  <p class="b-eyebrow">Einstellungen · folgt Hell/Dunkel des Systems · 520 pt breit, Höhe je Tab</p>
+  <h1 class="b-h1">Einstellungen und Hilfsfenster</h1>
+  <p class="b-lead">Aus vier Seiten mit Seitenleiste und erzwungenem Dunkelmodus werden fünf Toolbar-Tabs in einem Mac-üblichen Fenster: gruppierte Form, 13 pt Text, 11 pt Hilfetext, Schalter und Knöpfe im Jade-Ton des Logos. Wie bei Findling, nur mit Brimlets Farbe.</p>
+  <div class="b-specs">
+    <div class="b-spec"><b>520 pt</b><span>Breite, statt 700 pt</span></div>
+    <div class="b-spec"><b>290–620 pt</b><span>Höhe je Tab, scrollt darüber</span></div>
+    <div class="b-spec"><b>5 Tabs</b><span>statt 4 Seiten</span></div>
+    <div class="b-spec"><b>13 / 11 pt</b><span>Text / Hilfetext, nie kleiner</span></div>
+    <div class="b-spec"><b>#227F5F · #1EA87B</b><span>Akzent hell · dunkel</span></div>
+  </div>
+  <nav class="b-jump" aria-label="Abschnitte"><a href="#live">Live-Prototyp</a><a href="#gliederung">Gliederung</a><a href="#allgemein">Allgemein</a><a href="#module">Module</a><a href="#kalender">Kalender</a><a href="#mitteilungen">Mitteilungen</a><a href="#zitate">Zitate</a><a href="#update">Update-Ablauf</a><a href="#menue">Menüleiste</a><a href="#tr">Türkisch</a></nav>
+
+  <section class="b-section" id="live" aria-labelledby="live-h" data-od-id="settings-live">
+    <h2 class="b-title" id="live-h"><span class="b-num">1</span>Live-Prototyp</h2>
+    <p class="b-note">Tabs, Schalter, Häkchen, „Jetzt prüfen“, „Laden und installieren“, „App erlauben…“, „Entfernen“, Zitate löschen und „Jetzt zeigen“ funktionieren. Mit dem Fokus auf der Tableiste wechseln <kbd>←</kbd> <kbd>→</kbd> den Tab. Das Fenster wächst mit dem Inhalt wie ein echtes Einstellungsfenster.</p>
+    <div class="proto" role="group" aria-labelledby="ph"><div class="proto-h"><b id="ph">Nur Prototyp</b><span>Erscheinungsbild und Zustände simulieren. Kein Teil der App.</span></div>
+      <div class="proto-grid">
+        <div class="proto-g"><label>Erscheinungsbild</label><button class="pbtn" data-p="theme" data-v="light" aria-pressed="true">Hell</button><button class="pbtn" data-p="theme" data-v="dark" aria-pressed="false">Dunkel</button><button class="pbtn" data-p="theme" data-v="auto" aria-pressed="false">System</button></div>
+        <div class="proto-g"><label>Sprache</label><button class="pbtn" data-p="lang" data-v="en" aria-pressed="true">EN</button><button class="pbtn" data-p="lang" data-v="tr" aria-pressed="false">TR</button></div>
+        <div class="proto-g"><label for="p-up">Update</label><select class="psel" id="p-up"><option value="idle">Noch nicht geprüft</option><option value="last">Zuletzt geprüft</option><option value="upToDate">Aktuell</option><option value="checkFailed">Prüfung fehlgeschlagen</option><option value="available">Neue Version</option><option value="failed">Prüfsumme falsch</option><option value="noChecksum">Ohne Prüfsumme</option></select></div>
+        <div class="proto-g"><label for="p-login">Anmeldung</label><select class="psel" id="p-login"><option value="">Normal</option><option value="failed">Fehler</option><option value="approval">Freigabe nötig</option></select></div>
+        <div class="proto-g"><label for="p-cal">Kalenderzugriff</label><select class="psel" id="p-cal"><option value="ready">Erteilt</option><option value="notRequested">Nicht angefragt</option><option value="denied">Abgelehnt</option><option value="restricted">Eingeschränkt</option></select></div>
+        <div class="proto-g"><label>Weiteres</label><button class="pbtn" data-p="cmuxInstalled" aria-pressed="true">cmux installiert</button><button class="pbtn" data-p="displayMissing" aria-pressed="false">Display getrennt</button></div>
+      </div><p class="proto-log" id="log" role="status" aria-live="polite">Bereit.</p></div>
+    <div class="live-stage" id="stage" style="position:relative;margin-top:20px"><div id="live-settings"></div></div>
+  </section>
+
+  <section class="b-section" id="gliederung" aria-labelledby="g-h"><h2 class="b-title" id="g-h"><span class="b-num">2</span>Neue Gliederung</h2>
+    <p class="b-note">Die heutige Seite „Module“ trägt sechs verschiedene Aufgaben. Sie wird nach dem geteilt, was Menschen tatsächlich tun: Module wählen und ordnen, den Kalender einrichten, fremde Apps zulassen. „Erscheinungsbild“ geht in „Allgemein“ auf, weil es dort um Verhalten geht, nicht um Aussehen.</p>
+    <dl class="map">
+      <dt><span id="m1"></span>Allgemein</dt><dd>Version und Updates (oben, weil „Update auf …“ und „Nach Updates suchen…“ im Menü hierher führen) · Beim Anmelden öffnen · Display, Beim Zeigen aufklappen, Im Vollbild ausblenden, Brimlet zeigen · Datenschutz</dd>
+      <dt><span id="m2"></span>Module</dt><dd>Module ein/aus und Reihenfolge per Ziehen · Musik vorn halten · Trackwechsel zeigen · Spotify verbinden/trennen · Timer-Ton</dd>
+      <dt><span id="m3"></span>Kalender</dt><dd>Zugriff · Termin-Erinnerung · Alle Kalender und Auswahl je Konto mit Kalenderfarbe</dd>
+      <dt><span id="m4"></span>Mitteilungen</dt><dd>Erlaubte Apps (hinzufügen, entfernen, Fehler) · cmux-Sitzungen (nur wenn cmux installiert ist)</dd>
+      <dt><span id="m5"></span>Zitate</dt><dd>Ab und zu ein Zitat zeigen · Wie oft · Wie lange · Gespeicherte Zitate mit „Jetzt zeigen“ und Löschen</dd>
+    </dl>
+    <p class="b-note" style="margin-top:16px">Die vollständige Liste aller Bedienelemente mit altem und neuem Ort steht auf der Seite <a href="zuordnung.html">Zuordnung</a>.</p></section>
+
+  <section class="b-section" id="allgemein" aria-labelledby="a-h"><h2 class="b-title" id="a-h"><span class="b-num">3</span>Allgemein</h2>
+    <p class="b-note">Ganz oben steht Brimlet selbst: App-Symbol, Version, Status, „Jetzt prüfen“. Darunter die automatische Prüfung, dann der Anmeldestart, dann das Verhalten auf dem Bildschirm. Der Datenschutzhinweis wird zu einer ruhigen Fußzeile.</p>
+    <div class="pair" id="g-general"></div>
+    <h3 class="b-sub">Zustände</h3><div class="pair" id="g-general-states"></div></section>
+
+  <section class="b-section" id="module" aria-labelledby="mo-h"><h2 class="b-title" id="mo-h"><span class="b-num">4</span>Module</h2>
+    <p class="b-note">Eine Liste mit Ziehgriff statt Pfeiltasten (VoiceOver und Kontextmenü bieten „Nach oben“ / „Nach unten“ weiter an). Das Modulsymbol steht neutral auf einer leisen Fläche, nicht mehr in Mint. Was die kleine Ansicht zeigt, steht in einer eigenen Gruppe.</p>
+    <div class="pair" id="g-modules"></div>
+    <h3 class="b-sub">Zustände</h3><div class="pair" id="g-modules-states"></div></section>
+
+  <section class="b-section" id="kalender" aria-labelledby="k-h"><h2 class="b-title" id="k-h"><span class="b-num">5</span>Kalender</h2>
+    <p class="b-note">Kalender nach Konto gruppiert, jeweils mit ihrer Farbe aus macOS. Die Erinnerung steht oben, weil sie für alle Kalender gilt. Ist das Modul aus, bietet der Tab nur „Einschalten“ an; das ist derselbe Schalter wie unter Module.</p>
+    <div class="pair" id="g-cal"></div>
+    <h3 class="b-sub">Zugriff und leere Auswahl</h3><div class="pair" id="g-cal-states"></div></section>
+
+  <section class="b-section" id="mitteilungen" aria-labelledby="n-h"><h2 class="b-title" id="n-h"><span class="b-num">6</span>Mitteilungen</h2>
+    <p class="b-note">Erlaubte Apps mit Symbol, Name und Bundle-ID statt nur der ID. Fehler stehen in der Liste, dort, wo sie entstanden sind. cmux erscheint nur, wenn cmux installiert ist.</p>
+    <div class="pair" id="g-notif"></div>
+    <h3 class="b-sub">Zustände</h3><div class="pair" id="g-notif-states"></div></section>
+
+  <section class="b-section" id="zitate" aria-labelledby="z-h"><h2 class="b-title" id="z-h"><span class="b-num">7</span>Zitate</h2>
+    <p class="b-note">Zitate in New York 13/18 pt, höchstens drei Zeilen, darunter Autor · Quelle. „Jetzt zeigen“ sitzt neben der Überschrift, Löschen pro Zeile.</p>
+    <div class="pair" id="g-quotes"></div>
+    <h3 class="b-sub">Leer und ausgeschaltet</h3><div class="pair" id="g-quotes-states"></div></section>
+
+  <section class="b-section" id="update" aria-labelledby="u-h"><h2 class="b-title" id="u-h"><span class="b-num">8</span>Update-Ablauf</h2>
+    <p class="b-note">Eine Zeile, die ihren Zustand wechselt, wie heute. Fehler sind orange und sagen, was stattdessen passiert ist. Während Laden und Öffnen ist „Laden und installieren“ gesperrt.</p>
+    <div class="gal" id="g-update"></div></section>
+
+  <section class="b-section" id="menue" aria-labelledby="me-h"><h2 class="b-title" id="me-h"><span class="b-num">9</span>Menü der Menüleiste</h2>
+    <p class="b-note">Unverändert ein Standard-NSMenu. Gibt es eine neue Version, steht „Update auf …“ oben (hier hervorgehoben, wie beim Zeigen darauf) und öffnet „Allgemein“.</p>
+    <div class="gal" id="g-menu"></div></section>
+
+  <section class="b-section" id="tr" aria-labelledby="tr-h"><h2 class="b-title" id="tr-h"><span class="b-num">10</span>Türkisch</h2>
+    <p class="b-note">Die längsten Beschriftungen, etwa „Güncellemeleri otomatik denetle“ oder „Oturum açınca başlat“, passen ohne Kürzung; Hilfetexte brechen sauber um. Die Tableiste braucht mit „Özlü sözler“ 410 pt von 520.</p>
+    <div class="pair" id="g-tr"></div></section>
+
+  <p class="b-foot">Das App-Symbol ist Brimlets echtes Symbol. Das Symbol der erlaubten App ist ein Platzhalter (Terminal-Symbol dieses Macs) für „Reminders example“, die Beispiel-App aus Brimlets Entwicklerdoku. Kalendernamen und Konten sind Beispiele. Symbole sind SVG-Nachbildungen der SF Symbols.</p>
+</main>
+
+<script src="ui.js"></script>
+<script>
+(() => {
+'use strict';
+const B = window.BUI;
+const $ = (s) => document.querySelector(s);
+['gearshape', 'square.stack.3d.up', 'calendar', 'bell.badge', 'quote.opening'].forEach((n, i) => { $('#m' + (i + 1)).outerHTML = B.sym(n); });
+const allOn = { order: ['music', 'timer', 'calendar', 'todos'], on: { music: true, timer: true, calendar: true, todos: true } };
+const base = { lang: 'en', update: { state: 'last', lastCheck: '26 Oct 2026 at 09:12', current: '0.2.0' }, login: { on: true }, mods: allOn, spotify: 'connected', cal: { access: 'ready', reminder: 5 }, cmux: true };
+function win(id, s, cap, dark) {
+  const el = document.createElement('figure'); el.className = 'fig';
+  el.innerHTML = `<div class="wall ${dark ? 'is-dark' : ''}" inert>${B.settings({ ...base, ...s, theme: dark ? 'dark' : 'light' })}</div><figcaption class="fig-cap">${cap}</figcaption>`;
+  document.getElementById(id).appendChild(el);
+}
+const both = (id, s, cap) => { win(id, s, `<b>Hell.</b> ${cap}`, false); win(id, s, `<b>Dunkel.</b> ${cap}`, true); };
+
+both('g-general', { tab: 'general' }, 'Zuletzt geprüft, beim Anmelden öffnen ist an.');
+win('g-general-states', { tab: 'general', login: { on: false, error: 'failed' } }, '<b>Anmeldestart fehlgeschlagen.</b> Brimlet liegt nicht in „Programme“.');
+win('g-general-states', { tab: 'general', login: { on: true, error: 'approval' }, displayMissing: true }, '<b>Freigabe in Anmeldeobjekten nötig, gewähltes Display getrennt.</b>', true);
+
+both('g-modules', { tab: 'modules' }, 'Alle Module an, Spotify verbunden.');
+win('g-modules-states', { tab: 'modules', spotify: 'none', dragRow: 2, mods: { order: ['music', 'timer', 'calendar', 'todos'], on: { music: true, timer: true, calendar: false, todos: true } } }, '<b>Nicht verbunden, Kalender beim Umsortieren.</b> „Mit Spotify verbinden“ ist die eine Hauptaktion.');
+win('g-modules-states', { tab: 'modules', spotify: 'none', mods: { order: ['timer', 'todos', 'music', 'calendar'], on: { music: false, timer: false, calendar: false, todos: true } } }, '<b>Musik und Timer aus.</b> Verbinden und Timer-Ton gesperrt, mit Grund.', true);
+
+both('g-cal', { tab: 'calendar' }, 'Zugriff erteilt, alle Kalender.');
+win('g-cal-states', { tab: 'calendar', mods: { ...allOn, on: { ...allOn.on, calendar: false } } }, '<b>Modul aus.</b>');
+win('g-cal-states', { tab: 'calendar', cal: { access: 'notRequested' } }, '<b>Noch nicht angefragt.</b>');
+win('g-cal-states', { tab: 'calendar', cal: { access: 'denied' } }, '<b>Abgelehnt.</b>', true);
+win('g-cal-states', { tab: 'calendar', cal: { access: 'ready', all: false, sel: {} } }, '<b>Kein Kalender gewählt.</b> Hinweis statt Fußzeile.', true);
+
+both('g-notif', { tab: 'notifications' }, 'Eine erlaubte App, cmux an.');
+win('g-notif-states', { tab: 'notifications', notif: { apps: [] }, cmuxInstalled: false }, '<b>Keine App, cmux nicht installiert.</b>');
+win('g-notif-states', { tab: 'notifications', notif: { error: 'signature' }, cmux: false }, '<b>Signatur ungültig.</b>', true);
+win('g-notif-states', { tab: 'notifications', notif: { apps: [], error: 'receiver' }, cmuxInstalled: false }, '<b>Lokale Verbindung startet nicht.</b>');
+
+both('g-quotes', { tab: 'quotes' }, 'Zwei gespeicherte Zitate.');
+win('g-quotes-states', { tab: 'quotes', quotes: { on: false, list: [] } }, '<b>Aus und leer.</b> „Wie oft?“ gesperrt, Anleitung zu den Diensten.');
+win('g-quotes-states', { tab: 'quotes', quotes: { on: true, interval: 60, secs: 0, list: [] } }, '<b>An, leer, „bis ich schließe“.</b>', true);
+
+const ups = [['idle', 'Noch nicht geprüft.'], ['checking', 'Prüft gerade.'], ['upToDate', 'Aktuell.'], ['checkFailed', 'Prüfung fehlgeschlagen.'], ['available', 'Neue Version.'], ['downloading', 'Lädt (42 %).'], ['opening', 'Öffnet das Image, danach beendet sich Brimlet.'], ['failed', 'Prüfsumme falsch.'], ['noChecksum', 'Ohne Prüfsumme.']];
+ups.forEach(([st, cap], i) => {
+  const el = document.createElement('figure'); el.className = 'fig';
+  const html = B.settings({ ...base, tab: 'general', theme: i % 2 ? 'dark' : 'light', update: { state: st, version: '0.2.1', current: '0.2.0', progress: .42 } });
+  const part = html.split('<div class="sw-body')[0] + '<div class="sw-body"><section class="sw-sec"><div class="sw-box">' + html.split('<div class="sw-box">')[1].split('</div></section>')[0] + '</div></section></div></div>';
+  el.innerHTML = `<div class="wall ${i % 2 ? 'is-dark' : ''}" inert>${part}</div><figcaption class="fig-cap"><b>${i + 1}.</b> ${cap}</figcaption>`;
+  document.getElementById('g-update').appendChild(el);
+});
+[['light', false], ['dark', true], ['light', true]].forEach(([theme, upd], i) => {
+  const el = document.createElement('figure'); el.className = 'fig';
+  el.innerHTML = `<div class="wall ${theme === 'dark' ? 'is-dark' : ''}" style="padding:24px 40px" inert>${B.menu({ lang: i === 2 ? 'tr' : 'en', theme, update: upd })}</div><figcaption class="fig-cap">${i === 2 ? '<b>Türkisch</b>, mit Update.' : theme === 'dark' ? '<b>Dunkel</b>, mit Update.' : '<b>Hell</b>, ohne Update.'}</figcaption>`;
+  document.getElementById('g-menu').appendChild(el);
+});
+win('g-tr', { tab: 'general', lang: 'tr' }, '<b>Genel.</b>');
+win('g-tr', { tab: 'modules', lang: 'tr' }, '<b>Modüller.</b>', true);
+win('g-tr', { tab: 'quotes', lang: 'tr' }, '<b>Özlü sözler.</b>');
+
+const S = { lang: 'en', theme: 'light', tab: 'general', update: { auto: true, state: 'idle', current: '0.2.0', version: '0.2.1', lastCheck: '26 Oct 2026 at 09:12', progress: 0 }, login: { on: false, error: '' }, display: 'auto', displayMissing: false, hover: true, fullscreen: true, mods: { order: ['music', 'timer', 'calendar', 'todos'], on: { music: true, timer: true, calendar: false, todos: true } }, pinMusic: false, trackAlerts: true, timerSound: true, spotify: 'none', cal: { access: 'ready', reminder: 5, all: true, sel: { c1: true, c2: true, c3: true, c4: true, c5: true } }, notif: { apps: [{ name: 'Reminders example', id: 'com.example.reminders' }], error: null }, cmuxInstalled: true, cmux: false, quotes: { on: true, interval: 1440, secs: 30, list: B.DATA.quotes.slice() } };
+const root = $('#live-settings'); const stage = $('#stage');
+const mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+const log = (m) => { $('#log').textContent = m; };
+let dlT = null;
+function render() {
+  const a = document.activeElement; const key = a && root.contains(a) && a.dataset.act ? [a.dataset.act, a.dataset.v || ''] : null;
+  const theme = S.theme === 'auto' ? (mq && mq.matches ? 'dark' : 'light') : S.theme;
+  stage.classList.toggle('is-dark', theme === 'dark');
+  root.innerHTML = B.settings({ ...S, theme, interactive: true, maxH: 620 });
+  if (key) { const el = root.querySelector(`[data-act="${key[0]}"]${key[1] ? `[data-v="${key[1]}"]` : ''}`); if (el) el.focus({ preventScroll: true }); }
+}
+root.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
+  const a = el.dataset.act, v = el.dataset.v;
+  if (a === 'swtab') { S.tab = v; render(); return; }
+  if (a === 'sw') {
+    if (v.startsWith('mod-')) { const id = v.slice(4); S.mods.on[id] = !S.mods.on[id]; if (id === 'calendar' && S.mods.on.calendar) log('Kalender eingeschaltet: macOS fragt jetzt nach dem Zugriff.'); }
+    else if (v === 'auto') S.update.auto = !S.update.auto;
+    else if (v === 'login') { S.login.on = !S.login.on; }
+    else if (v === 'allcal') { S.cal.all = !S.cal.all; if (!S.cal.all) S.cal.sel = { c1: true, c2: true, c3: true, c4: true, c5: true }; }
+    else if (v === 'quotes') S.quotes.on = !S.quotes.on;
+    else if (v === 'pin') S.pinMusic = !S.pinMusic;
+    else if (v === 'alerts') S.trackAlerts = !S.trackAlerts;
+    else if (v === 'sound') S.timerSound = !S.timerSound;
+    else S[v] = !S[v];
+    render(); return;
+  }
+  if (a === 'cal') { if (S.cal.all) { S.cal.all = false; S.cal.sel = { c1: true, c2: true, c3: true, c4: true, c5: true }; } S.cal.sel[v] = !S.cal.sel[v]; render(); return; }
+  if (a === 'check') { S.update.state = 'checking'; render(); setTimeout(() => { S.update.state = 'upToDate'; render(); log('Geprüft: Das ist die neueste Version.'); }, 1300); return; }
+  if (a === 'connect') { S.spotify = 'connected'; render(); log('macOS fragt, ob Brimlet Spotify steuern darf.'); return; }
+  if (a === 'disconnect') { S.spotify = 'none'; render(); return; }
+  if (a === 'calon') { S.mods.on.calendar = true; render(); log('Kalender eingeschaltet: macOS fragt jetzt nach dem Zugriff.'); return; }
+  if (a === 'rmapp') { S.notif.apps = []; render(); log('Erlaubnis entfernt.'); return; }
+  if (a === 'addapp') { S.notif.apps = [{ name: 'Reminders example', id: 'com.example.reminders' }]; render(); log('Öffnet die App-Auswahl (NSOpenPanel), hier simuliert.'); return; }
+  if (a === 'delquote') { S.quotes.list.shift(); render(); return; }
+  if (a === 'shownow') { log('Die Zitatkarte erscheint am rechten Bildschirmrand.'); return; }
+  if (a === 'show') { log('Brimlet wird eingeblendet und aufgeklappt.'); return; }
+});
+root.addEventListener('click', (e) => {
+  const b = e.target.closest('.sw-btn.is-p'); if (!b || b.disabled || !/Download|İndir/.test(b.textContent)) return;
+  S.update.state = 'downloading'; S.update.progress = 0; render(); clearInterval(dlT);
+  dlT = setInterval(() => { S.update.progress = Math.min(1, S.update.progress + .12); if (S.update.progress >= 1) { clearInterval(dlT); S.update.state = 'opening'; log('Prüfsumme stimmt. Das Image öffnet sich, Brimlet beendet sich nach 3 s.'); } render(); }, 350);
+});
+root.addEventListener('keydown', (e) => {
+  if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && e.target.classList.contains('sw-tab')) {
+    const ids = B.TABS.map((x) => x[0]); const i = ids.indexOf(S.tab);
+    S.tab = ids[(i + (e.key === 'ArrowRight' ? 1 : -1) + ids.length) % ids.length]; render();
+    const f = root.querySelector(`[data-act="swtab"][data-v="${S.tab}"]`); f && f.focus();
+  }
+});
+document.querySelectorAll('.proto [data-p]').forEach((b) => b.addEventListener('click', () => {
+  const p = b.dataset.p;
+  if (p === 'theme' || p === 'lang') { S[p] = b.dataset.v; document.querySelectorAll(`.proto [data-p="${p}"]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b))); if (p === 'lang') S.update.lastCheck = S.lang === 'tr' ? '26 Eki 2026 09:12' : '26 Oct 2026 at 09:12'; }
+  else { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); S[p] = on; }
+  render();
+}));
+$('#p-up').addEventListener('change', (e) => { const v = e.target.value; S.update.state = v === 'last' ? 'idle' : v; S.update.lastCheck = v === 'last' ? (S.lang === 'tr' ? '26 Eki 2026 09:12' : '26 Oct 2026 at 09:12') : null; S.tab = 'general'; render(); });
+$('#p-login').addEventListener('change', (e) => { S.login.error = e.target.value; S.tab = 'general'; render(); });
+$('#p-cal').addEventListener('change', (e) => { S.cal.access = e.target.value; S.mods.on.calendar = true; S.tab = 'calendar'; render(); });
+if (mq) mq.addEventListener('change', () => S.theme === 'auto' && render());
+S.update.lastCheck = null;
+render();
+})();
+</script>
+</body>
+</html>

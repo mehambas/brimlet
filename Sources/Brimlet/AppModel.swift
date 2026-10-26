@@ -12,7 +12,7 @@ import BrimletIPC
     let quotes: QuoteStore
     let cmux = CmuxSessionWatcher()
     let updater: Updater
-    @Published var settingsTab = SettingsTab.modules
+    @Published var settingsTab = SettingsTab.general
     @Published var geometry = IslandGeometry(notchWidth: 0, topInset: 0, screenWidth: 1512)
     @Published private(set) var isExpanded = false
     @Published private(set) var isPeeking = false

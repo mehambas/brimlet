@@ -6,7 +6,7 @@ Other apps on the same Mac can show a short notification in Brimlet: a title, a 
 
 Both sides choose each other explicitly:
 
-1. In Brimlet, **Settings › Modules › Allow an App…** and choose the sender's signed `.app`. **Remove** takes the permission back.
+1. In Brimlet, **Settings › Notifications › Allow an App…** and choose the sender's signed `.app`. **Remove** takes the permission back.
 2. In the sender, let the user choose `Brimlet.app` and store its designated requirement.
 
 Each side stores the other app's [designated requirement](https://developer.apple.com/documentation/security/seccodecopydesignatedrequirement(_:_:_:)). On every connection the running peer is checked against it through the audit token the kernel attaches to the socket ([`kSecGuestAttributeAudit`](https://developer.apple.com/documentation/security/ksecguestattributeaudit)) and `SecCodeCheckValidity`; the identifier in the payload only selects which stored permission applies. Both processes must belong to the same user.

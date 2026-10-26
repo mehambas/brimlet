@@ -32,7 +32,6 @@ private final class QuoteFloatingPanel: NSPanel {
         panel.hidesOnDeactivate = false
         panel.isOpaque = false
         panel.backgroundColor = .clear
-        panel.appearance = NSAppearance(named: .darkAqua)
         panel.hasShadow = true
         panel.animationBehavior = .none
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
@@ -79,9 +78,9 @@ private final class QuoteFloatingPanel: NSPanel {
             finishClosing(closingID)
             return
         }
-        let destination = panel.frame.offsetBy(dx: 90, dy: 0)
+        let destination = panel.frame.offsetBy(dx: 24, dy: 0)
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.45
+            context.duration = 0.3
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
             panel.animator().setFrame(destination, display: true)
             panel.animator().alphaValue = 0
@@ -131,7 +130,7 @@ private final class QuoteFloatingPanel: NSPanel {
                            width: size.width, height: size.height)
         let wasVisible = panel.isVisible
         if !wasVisible {
-            panel.setFrame(frame.offsetBy(dx: 72, dy: 0), display: true)
+            panel.setFrame(frame.offsetBy(dx: 24, dy: 0), display: true)
             panel.alphaValue = 0
         }
         panel.orderFrontRegardless()
@@ -141,7 +140,7 @@ private final class QuoteFloatingPanel: NSPanel {
             finishEntering(enteringID)
         } else {
             NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.7
+                context.duration = 0.45
                 context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                 panel.animator().setFrame(frame, display: true)
                 panel.animator().alphaValue = 1
@@ -152,7 +151,7 @@ private final class QuoteFloatingPanel: NSPanel {
     }
 
     static func readingHeight(for quote: SavedQuote, width: CGFloat, maximum: CGFloat) -> CGFloat {
-        let measurement = NSHostingView(rootView: QuoteReadingContent(quote: quote).frame(width: width - 48))
+        let measurement = NSHostingView(rootView: QuoteReadingContent(quote: quote).frame(width: width - 44))
         return min(max(90, ceil(measurement.fittingSize.height)), max(90, maximum))
     }
 
@@ -195,19 +194,15 @@ struct QuoteReadingContent: View {
     let quote: SavedQuote
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("“\(quote.text)”")
-                .font(.system(size: 18, weight: .regular, design: .serif))
-                .lineSpacing(6).foregroundStyle(Color.white.opacity(0.94))
+                .font(.system(size: 17, weight: .regular, design: .serif))
+                .lineSpacing(6).foregroundStyle(BrimletTheme.quoteLabel)
                 .fixedSize(horizontal: false, vertical: true)
             if !quote.author.isEmpty || !quote.source.isEmpty {
-                HStack(alignment: .top, spacing: 10) {
-                    RoundedRectangle(cornerRadius: 1).fill(BrimletTheme.mint.opacity(0.65)).frame(width: 2)
-                    VStack(alignment: .leading, spacing: 5) {
-                        if !quote.author.isEmpty { Text(quote.author).font(.system(size: 12, weight: .medium)).foregroundStyle(.white.opacity(0.75)) }
-                        if !quote.source.isEmpty { Text(quote.source).font(.system(size: 11)).foregroundStyle(.white.opacity(0.48)) }
-                    }.fixedSize(horizontal: false, vertical: true)
-                }.fixedSize(horizontal: false, vertical: true)
+                Text(verbatim: "— " + [quote.author, quote.source].filter { !$0.isEmpty }.joined(separator: " · "))
+                    .font(.system(size: 13)).foregroundStyle(BrimletTheme.quoteSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }.frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -227,16 +222,16 @@ struct QuotePanelView: View {
     @State private var source = ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Label(quote == nil ? "Add to Brimlet as Quote" : "One of your quotes", systemImage: "quote.opening")
-                    .font(.system(size: 11, weight: .medium)).foregroundStyle(BrimletTheme.mint)
+                    .font(.system(size: 12, weight: .semibold)).foregroundStyle(BrimletTheme.quoteAccent)
                 Spacer()
                 Button(action: onClose) {
-                    Image(systemName: "xmark").font(.system(size: 10, weight: .semibold))
+                    Image(systemName: "xmark").font(.system(size: 11, weight: .semibold))
                         .frame(width: 28, height: 28)
-                        .background(Color.white.opacity(0.065), in: Circle())
-                }.buttonStyle(.plain).foregroundStyle(.white.opacity(0.65))
+                        .background(Color.primary.opacity(0.06), in: Circle())
+                }.buttonStyle(.plain).foregroundStyle(BrimletTheme.quoteSecondary)
                     .help("Close").accessibilityLabel("Close Quote")
             }.frame(height: 28)
             if let quote {
@@ -245,31 +240,31 @@ struct QuotePanelView: View {
                 }.scrollBounceBehavior(.basedOnSize).frame(height: contentHeight)
                 HStack {
                     Text(preferences.quoteDisplaySeconds == 0 ? "Open until you close it" : "\(preferences.quoteDisplaySeconds) s · Waits while you hover")
-                        .font(.system(size: 10)).foregroundStyle(.white.opacity(0.38))
+                        .font(.system(size: 11)).foregroundStyle(BrimletTheme.quoteSecondary)
                     Spacer()
                     Button("Close", action: onClose).font(.system(size: 11, weight: .medium))
-                        .buttonStyle(.plain).foregroundStyle(.white.opacity(0.7))
+                        .buttonStyle(.plain).foregroundStyle(BrimletTheme.quoteSecondary)
                 }.frame(height: 28)
             } else {
                 TextEditor(text: $text).font(.system(size: 14, design: .serif))
                     .scrollContentBackground(.hidden).padding(10).frame(height: 120)
-                    .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+                    .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 10))
                 HStack(alignment: .top, spacing: 12) {
                     sourceField("Person or author", placeholder: "Optional", value: $author)
                     sourceField("Book or source", placeholder: "Optional", value: $source)
                 }
                 HStack {
-                    Text("Where it’s from is up to you.").font(.system(size: 10)).foregroundStyle(.white.opacity(0.4))
+                    Text("Where it’s from is up to you.").font(.system(size: 11)).foregroundStyle(BrimletTheme.quoteSecondary)
                     Spacer()
-                    Button("Save") { onSave(text, author, source) }.buttonStyle(QuoteActionStyle())
+                    Button("Save") { onSave(text, author, source) }.buttonStyle(.borderedProminent)
                         .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
         }
-        .padding(24).frame(width: width)
-        .background(Color(red: 0.065, green: 0.085, blue: 0.08), in: RoundedRectangle(cornerRadius: 22))
-        .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(BrimletTheme.mint.opacity(0.18), lineWidth: 1))
-        .foregroundStyle(.white).environment(\.colorScheme, .dark).preferredColorScheme(.dark)
+        .padding(.horizontal, 22).padding(.top, 20).padding(.bottom, 18).frame(width: width)
+        .background(LinearGradient(colors: [BrimletTheme.quoteTop, BrimletTheme.quoteBottom], startPoint: .top, endPoint: .bottom), in: RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.primary.opacity(0.14), lineWidth: 0.5))
+        .foregroundStyle(BrimletTheme.quoteLabel).tint(BrimletTheme.jade)
         .onAppear { text = draftText }
         .onHover(perform: onHover)
         .onExitCommand(perform: onClose)
@@ -277,16 +272,9 @@ struct QuotePanelView: View {
 
     private func sourceField(_ title: LocalizedStringKey, placeholder: LocalizedStringKey, value: Binding<String>) -> some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(title).font(.system(size: 10, weight: .medium)).foregroundStyle(.white.opacity(0.55))
+            Text(title).font(.system(size: 11, weight: .medium)).foregroundStyle(BrimletTheme.quoteSecondary)
             TextField(placeholder, text: value).textFieldStyle(.plain).font(.system(size: 12))
-                .padding(9).background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                .padding(9).background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
         }
-    }
-}
-
-private struct QuoteActionStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label.font(.system(size: 11, weight: .semibold)).foregroundStyle(Color.black)
-            .padding(.horizontal, 16).padding(.vertical, 9).background(BrimletTheme.mint.opacity(configuration.isPressed ? 0.75 : 1), in: Capsule())
     }
 }

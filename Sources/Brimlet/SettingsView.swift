@@ -3,186 +3,225 @@ import SwiftUI
 import ServiceManagement
 import BrimletCore
 
-enum SettingsTab: Int { case modules, appearance, general, quotes }
+enum SettingsTab: String, CaseIterable {
+    case general, modules, calendar, notifications, quotes
+
+    var title: String {
+        switch self {
+        case .general: return String(localized: "General")
+        case .modules: return String(localized: "Modules")
+        case .calendar: return String(localized: "Calendar")
+        case .notifications: return String(localized: "Notifications")
+        case .quotes: return String(localized: "Quotes")
+        }
+    }
+    var symbol: String {
+        switch self {
+        case .general: return "gearshape"
+        case .modules: return "square.stack.3d.up"
+        case .calendar: return "calendar"
+        case .notifications: return "bell.badge"
+        case .quotes: return "quote.opening"
+        }
+    }
+    @MainActor func height(model: AppModel) -> CGFloat {
+        switch self {
+        case .general, .modules: return 620
+        case .calendar: return model.preferences.calendarEnabled ? min(620, 330 + CGFloat(model.calendar.calendars.count) * 42) : 290
+        case .notifications: return min(620, 290 + CGFloat(model.preferences.externalNotificationRequirements.count) * 48)
+        case .quotes: return min(620, 360 + CGFloat(model.quotes.quotes.count) * 80)
+        }
+    }
+}
 
 struct SettingsView: View {
     @ObservedObject var model: AppModel
     @ObservedObject var preferences: Preferences
     @ObservedObject var updater: Updater
+    var tab: SettingsTab? = nil
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var loginError: String?
 
     var body: some View {
-        HStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 10) {
-                    Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 42, height: 42)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(verbatim: "Brimlet").font(.system(size: 22, weight: .semibold, design: .rounded))
-                        Text("A little room up top.").font(.system(size: 9)).foregroundStyle(.secondary)
-                    }
-                }.padding(.bottom, 27).padding(.top, 20)
-                navigation("Modules", symbol: "square.stack.3d.up", tab: .modules)
-                navigation("Appearance", symbol: "rectangle.topthird.inset.filled", tab: .appearance)
-                navigation("General", symbol: "slider.horizontal.3", tab: .general)
-                navigation("Quotes", symbol: "quote.opening", tab: .quotes)
-                Spacer()
-                HStack(spacing: 5) {
-                    Circle().fill(BrimletTheme.mint).frame(width: 5, height: 5)
-                    Text("No account, no analytics.").font(.system(size: 10)).foregroundStyle(.secondary)
-                }
-                Text("Version \(updater.current.description)").font(.system(size: 9)).foregroundStyle(.tertiary).padding(.top, 5)
+        Form {
+            switch tab ?? model.settingsTab {
+            case .general: general
+            case .modules: modules
+            case .calendar: calendarSettings
+            case .notifications: notificationSettings
+            case .quotes: quoteSettings
             }
-            .padding(20).frame(width: 205)
-            .background(Color.white.opacity(0.025))
-            Rectangle().fill(Color.white.opacity(0.07)).frame(width: 1)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    switch model.settingsTab {
-                    case .modules: modules
-                    case .appearance: appearance
-                    case .general: general
-                    case .quotes: quoteSettings
-                    }
-                }.padding(28)
-            }.frame(maxWidth: .infinity)
         }
-        .frame(width: 700, height: 550)
-        .background(Color(red: 0.075, green: 0.085, blue: 0.085))
-        .foregroundStyle(Color.white)
-        .environment(\.colorScheme, .dark)
-        .preferredColorScheme(.dark)
-        .tint(BrimletTheme.mint)
-    }
-
-    private func navigation(_ title: LocalizedStringKey, symbol: String, tab: SettingsTab) -> some View {
-        let selected = model.settingsTab == tab
-        return Button { model.settingsTab = tab } label: {
-            HStack(spacing: 10) {
-                Image(systemName: symbol).frame(width: 18)
-                Text(title)
-                Spacer()
-            }
-            .font(.system(size: 12, weight: selected ? .semibold : .regular))
-            .foregroundStyle(selected ? BrimletTheme.mint : Color.white.opacity(0.55))
-            .padding(.horizontal, 12).padding(.vertical, 11)
-            .background(selected ? BrimletTheme.mint.opacity(0.09) : Color.clear, in: RoundedRectangle(cornerRadius: 9))
-            .contentShape(Rectangle())
-        }.buttonStyle(.plain)
+        .formStyle(.grouped)
+        .font(.system(size: 13))
+        .controlSize(.small)
+        .tint(BrimletTheme.jade)
+        .frame(width: 520)
+        .frame(maxHeight: .infinity)
+        .background(Color(nsColor: .windowBackgroundColor))
     }
 
     private var modules: some View {
         Group {
-            heading("What should live up here?", subtitle: "Turn on what you need, in the order you like.")
-            VStack(spacing: 10) {
+            Section {
                 ForEach(preferences.moduleOrder) { module in
-                    HStack(spacing: 12) {
-                        Image(systemName: module.symbol).font(.system(size: 18)).foregroundStyle(BrimletTheme.mint)
-                            .frame(width: 38, height: 42).background(BrimletTheme.mint.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(module.title).font(.system(size: 13, weight: .semibold))
-                            Text(moduleDescription(module))
-                                .font(.system(size: 10)).foregroundStyle(.secondary)
+                    HStack(spacing: 10) {
+                        Image(systemName: module.symbol).font(.system(size: 15))
+                            .frame(width: 26, height: 26)
+                            .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 7))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(module.title)
+                            Text(moduleDescription(module)).font(.system(size: 11)).foregroundStyle(.secondary)
                         }
-                        Spacer(minLength: 0)
-                        VStack(spacing: 1) {
-                            Button { preferences.move(module, by: -1) } label: { Image(systemName: "chevron.up").font(.system(size: 9)) }
-                                .disabled(preferences.moduleOrder.first == module).help("Move Up")
-                            Button { preferences.move(module, by: 1) } label: { Image(systemName: "chevron.down").font(.system(size: 9)) }
-                                .disabled(preferences.moduleOrder.last == module).help("Move Down")
-                        }.buttonStyle(.plain).foregroundStyle(.secondary)
-                        Toggle(module.title, isOn: moduleBinding(module))
-                            .labelsHidden().toggleStyle(.switch).controlSize(.small)
-                    }.padding(13).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 13))
-                }
-            }
-            Text("When several modules have something going on, the higher one wins. In the open panel, the tabs switch between them.")
-                .font(.system(size: 11)).foregroundStyle(.secondary).lineSpacing(4)
-            VStack(alignment: .leading, spacing: 16) {
-                settingToggle("Keep music in front", detail: "The small view always shows the music module.", value: $preferences.pinMusic)
-                settingToggle("Show track changes", detail: "Briefly shows the new track.", value: $preferences.trackAlerts)
-                settingToggle("Play a sound when time’s up", detail: "A short sound when the timer ends.", value: $preferences.timerSound)
-            }
-            if !preferences.spotifyRequested {
-                Button("Connect to Spotify") { model.connectSpotify() }.buttonStyle(MintButtonStyle()).disabled(!preferences.musicEnabled)
-            } else {
-                HStack {
-                    Label("Connected to Spotify", systemImage: "checkmark.circle").font(.system(size: 11)).foregroundStyle(.secondary)
-                    Spacer()
-                    Button("Disconnect") { preferences.spotifyRequested = false }.font(.system(size: 11))
-                }
-            }
-            if preferences.calendarEnabled { calendarSettings }
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Notifications from other apps").font(.system(size: 13, weight: .semibold))
-                Text("Apps you allow can show short notifications in Brimlet.")
-                    .font(.system(size: 11)).foregroundStyle(.secondary)
-                ForEach(preferences.externalNotificationRequirements.keys.sorted(), id: \.self) { id in
-                    HStack {
-                        Text(verbatim: id).font(.system(size: 11))
-                        Spacer()
-                        Button("Remove") { preferences.externalNotificationRequirements.removeValue(forKey: id) }
+                        Spacer(minLength: 4)
+                        VStack(spacing: 0) {
+                            Button { preferences.move(module, by: -1) } label: { Image(systemName: "chevron.up").font(.system(size: 11)) }
+                                .disabled(preferences.moduleOrder.first == module).help("Move Up").accessibilityLabel("Move Up")
+                            Button { preferences.move(module, by: 1) } label: { Image(systemName: "chevron.down").font(.system(size: 11)) }
+                                .disabled(preferences.moduleOrder.last == module).help("Move Down").accessibilityLabel("Move Down")
+                        }.buttonStyle(.borderless)
+                        Toggle(module.title, isOn: moduleBinding(module)).labelsHidden().toggleStyle(.switch)
+                    }
+                    .draggable(module.rawValue)
+                    .dropDestination(for: String.self) { values, _ in
+                        guard let value = values.first, let source = ModuleID(rawValue: value),
+                              let from = preferences.moduleOrder.firstIndex(of: source),
+                              let to = preferences.moduleOrder.firstIndex(of: module) else { return false }
+                        var order = preferences.moduleOrder
+                        order.remove(at: from)
+                        order.insert(source, at: to)
+                        preferences.moduleOrder = order
+                        return true
                     }
                 }
-                Button("Allow an App…") { model.authorizeExternalApplication() }
-                if let error = model.externalReceiverError { Text(error).font(.system(size: 11)).foregroundStyle(.orange) }
+            } header: { Text("Modules") } footer: {
+                footnote("When several modules have something going on, the higher one wins. In the open panel, the tabs switch between them.")
             }
-            if CmuxSessionWatcher.isInstalled {
-                VStack(alignment: .leading, spacing: 10) {
-                    settingToggle("Show cmux sessions", detail: "Checks every 5 seconds for sessions waiting for your reply and opens them in cmux.", value: $preferences.cmuxEnabled)
-                }.padding(14).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 12))
+            Section("Small View") {
+                settingToggle("Keep music in front", detail: "The small view always shows the music module.", value: $preferences.pinMusic)
+                settingToggle("Show track changes", detail: "Briefly shows the new track.", value: $preferences.trackAlerts)
             }
-            Text("Turning on Calendar asks macOS for access. Events are only read; your calendar is never changed.")
-                .font(.system(size: 10)).foregroundStyle(.secondary)
-            Text("Turning off the timer module resets a running timer.").font(.system(size: 10)).foregroundStyle(.tertiary)
+            Section("Music") {
+                HStack {
+                    Label(preferences.spotifyRequested ? "Connected to Spotify" : "Not connected", systemImage: preferences.spotifyRequested ? "checkmark.circle" : "music.note")
+                    Spacer()
+                    if preferences.spotifyRequested {
+                        Button("Disconnect") { preferences.spotifyRequested = false }
+                    } else {
+                        Button("Connect to Spotify") { model.connectSpotify() }.buttonStyle(.borderedProminent).disabled(!preferences.musicEnabled)
+                    }
+                }
+                if !preferences.musicEnabled { footnote("Turn on Music to connect Spotify.") }
+            }
+            Section {
+                settingToggle("Play a sound when time’s up", detail: "A short sound when the timer ends.", value: $preferences.timerSound).disabled(!preferences.timerEnabled)
+            } header: { Text("Timer") } footer: {
+                VStack(alignment: .leading, spacing: 4) {
+                    footnote("Turning off the timer module resets a running timer.")
+                    footnote("The timer runs while Brimlet is open and ends when you quit it.")
+                }
+            }
         }
     }
 
     private var calendarSettings: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Calendar").font(.system(size: 14, weight: .semibold))
-            Picker("Event reminder", selection: $preferences.calendarReminderMinutes) {
-                Text("Off").tag(0)
-                Text("5 minutes before").tag(5)
-                Text("10 minutes before").tag(10)
-            }.font(.system(size: 12))
-            Text("Shows a short reminder while Brimlet is open and visible. Not for all-day events.")
-                .font(.system(size: 10)).foregroundStyle(.secondary)
-            Divider()
-            Toggle("All Calendars", isOn: Binding(get: {
-                preferences.calendarSelection == nil
-            }, set: { all in
-                preferences.calendarSelection = all ? nil : model.calendar.calendars.map(\.id)
-            })).toggleStyle(.switch).controlSize(.small)
-            if model.calendar.calendars.isEmpty {
-                Text("Your calendars appear here once Brimlet has access.")
-                    .font(.system(size: 10)).foregroundStyle(.secondary)
-            }
-            ForEach(model.calendar.calendars) { source in
-                Toggle(isOn: Binding(get: {
-                    preferences.calendarSelection?.contains(source.id) ?? true
-                }, set: { selected in
-                    var ids = Set(preferences.calendarSelection ?? model.calendar.calendars.map(\.id))
-                    if selected { ids.insert(source.id) } else { ids.remove(source.id) }
-                    preferences.calendarSelection = ids.sorted()
-                })) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(source.title).font(.system(size: 12))
-                        Text(source.account).font(.system(size: 10)).foregroundStyle(.secondary)
+        Group {
+            if !preferences.calendarEnabled {
+                Section {
+                    HStack {
+                        Label("Calendar is off", systemImage: "calendar")
+                        Spacer()
+                        Button("Turn On") { preferences.calendarEnabled = true }.buttonStyle(.borderedProminent)
                     }
-                }.toggleStyle(.checkbox)
+                } footer: { calendarPrivacy }
+            } else {
+                Section("Access") {
+                    calendarAccess
+                }
+                if model.calendar.access == .ready {
+                    Section {
+                        Picker("Event reminder", selection: $preferences.calendarReminderMinutes) {
+                            Text("Off").tag(0)
+                            Text("5 minutes before").tag(5)
+                            Text("10 minutes before").tag(10)
+                        }
+                    } footer: { footnote("Shows a short reminder while Brimlet is open and visible. Not for all-day events.") }
+                    Section {
+                        Toggle("All Calendars", isOn: Binding(get: { preferences.calendarSelection == nil }, set: { all in
+                            preferences.calendarSelection = all ? nil : model.calendar.calendars.map(\.id)
+                        })).toggleStyle(.switch)
+                        ForEach(model.calendar.calendars) { source in
+                            Toggle(isOn: Binding(get: { preferences.calendarSelection?.contains(source.id) ?? true }, set: { selected in
+                                var ids = Set(preferences.calendarSelection ?? model.calendar.calendars.map(\.id))
+                                if selected { ids.insert(source.id) } else { ids.remove(source.id) }
+                                preferences.calendarSelection = ids.sorted()
+                            })) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    HStack(spacing: 6) {
+                                        if let color = source.colorRGB { Circle().fill(Color(hex: color)).frame(width: 7, height: 7) }
+                                        Text(source.title)
+                                    }
+                                    Text(source.account).font(.system(size: 11)).foregroundStyle(.secondary)
+                                }
+                            }.toggleStyle(.checkbox)
+                        }
+                        if model.calendar.calendars.isEmpty { footnote("Your calendars appear here once Brimlet has access.") }
+                    } header: { Text("Calendars") } footer: {
+                        if preferences.calendarSelection?.isEmpty == true {
+                            footnote("No calendar is selected, so no events or reminders are shown.")
+                        } else { calendarPrivacy }
+                    }
+                } else {
+                    Section { footnote("Your calendars appear here once Brimlet has access.") } footer: { calendarPrivacy }
+                }
             }
-            if preferences.calendarSelection?.isEmpty == true {
-                Text("No calendar is selected, so no events or reminders are shown.")
-                    .font(.system(size: 10)).foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder private var calendarAccess: some View {
+        switch model.calendar.access {
+        case .ready: Label("Full access", systemImage: "checkmark.circle")
+        case .requesting:
+            HStack { ProgressView().controlSize(.small); Text("Waiting for calendar access…") }
+        case .denied, .restricted:
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Calendar access is off", systemImage: "exclamationmark.triangle")
+                footnote(model.calendar.access == .restricted ? "Calendar access is restricted on this Mac." : "Turn on full access in System Settings › Privacy & Security › Calendars.")
+                if model.calendar.access != .restricted { Button("Open System Settings") { model.calendar.openPrivacySettings() } }
             }
-        }.padding(16).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 13))
+        case .notRequested, .failed:
+            VStack(alignment: .leading, spacing: 8) {
+                footnote(model.calendar.access == .failed ? "Couldn’t connect to Calendar. You can try again." : "Allow calendar access to see your upcoming events.")
+                Button("Connect Calendar") { model.calendar.requestAccess() }.buttonStyle(.borderedProminent)
+            }
+        }
+    }
+
+    private var calendarPrivacy: some View {
+        footnote("Turning on Calendar asks macOS for access. Events are only read; your calendar is never changed.")
+    }
+
+    private var notificationSettings: some View {
+        Group {
+            Section {
+                if preferences.externalNotificationRequirements.isEmpty { Text("No apps allowed yet").foregroundStyle(.secondary) }
+                ForEach(preferences.externalNotificationRequirements.keys.sorted(), id: \.self) { id in
+                    AllowedApplicationRow(id: id) { preferences.externalNotificationRequirements.removeValue(forKey: id) }
+                }
+                if let error = model.externalReceiverError { Text(error).font(.system(size: 11)).foregroundStyle(.orange) }
+                Button("Allow an App…") { model.authorizeExternalApplication() }
+            } header: { Text("Notifications from other apps") } footer: { footnote("Apps you allow can show short notifications in Brimlet.") }
+            if CmuxSessionWatcher.isInstalled {
+                Section("cmux") {
+                    settingToggle("Show cmux sessions", detail: "Checks every 5 seconds for sessions waiting for your reply and opens them in cmux.", value: $preferences.cmuxEnabled)
+                }
+            }
+        }
     }
 
     private var quoteSettings: some View {
         Group {
-            heading("Words to keep you company.", subtitle: "Quotes you save show up next to Brimlet, on a calm card of their own.")
-            VStack(alignment: .leading, spacing: 15) {
+            Section {
                 settingToggle("Show a quote now and then", detail: "The card slides in from the right edge and leaves the modules alone.", value: $preferences.quotesEnabled)
                 Picker("How often?", selection: $preferences.quoteIntervalMinutes) {
                     Text("Every 15 minutes").tag(15)
@@ -203,107 +242,65 @@ struct SettingsView: View {
                     Text("Until I close it").tag(0)
                 }.font(.system(size: 12))
                 Text("The card stays while the pointer is on it. Close it any time with ×.")
-                    .font(.system(size: 10)).foregroundStyle(.secondary)
-            }.padding(16).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 13))
-            HStack {
-                Text("Saved quotes · \(model.quotes.quotes.count)").font(.system(size: 13, weight: .semibold))
-                Spacer()
-                if let quote = model.quotes.quotes.first {
-                    Button("Show Now") { model.onShowQuote?(quote) }.font(.system(size: 11))
-                }
+                    .font(.system(size: 11)).foregroundStyle(.secondary)
+
             }
-            if model.quotes.quotes.isEmpty {
-                Text("Select some text in a PDF or a web page, Control-click it and choose Services › Add to Brimlet as Quote.")
-                    .font(.system(size: 11)).foregroundStyle(.secondary).lineSpacing(4)
-                    .padding(16).frame(maxWidth: .infinity, alignment: .leading).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 12))
-            } else {
+            Section {
+                if model.quotes.quotes.isEmpty {
+                    footnote("Select some text in a PDF or a web page, Control-click it and choose Services › Add to Brimlet as Quote.")
+                }
                 ForEach(model.quotes.quotes) { quote in
                     HStack(alignment: .top, spacing: 12) {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "“\(quote.text)”").font(.system(size: 12, design: .serif)).lineLimit(4)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(verbatim: "“\(quote.text)”").font(.system(size: 13, design: .serif)).lineLimit(3)
                             let attribution = [quote.author, quote.source].filter { !$0.isEmpty }.joined(separator: " · ")
-                            if !attribution.isEmpty { Text(attribution).font(.system(size: 10)).foregroundStyle(.secondary) }
+                            if !attribution.isEmpty { Text(attribution).font(.system(size: 11)).foregroundStyle(.secondary) }
                         }
                         Spacer(minLength: 0)
                         Button(role: .destructive) { model.quotes.delete(quote) } label: { Image(systemName: "trash") }
-                            .buttonStyle(.plain).foregroundStyle(.secondary).help("Delete Quote")
-                    }.padding(13).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 12))
+                            .buttonStyle(.borderless).help("Delete Quote").accessibilityLabel("Delete Quote")
+                    }
                 }
+                if let quote = model.quotes.quotes.first { Button("Show Now") { model.onShowQuote?(quote) } }
+            } header: { Text("Saved quotes · \(model.quotes.quotes.count)") } footer: {
+                footnote("Your quotes are kept on this Mac. Quotes you haven’t seen yet come first.")
             }
-            Text("Your quotes are kept on this Mac. Quotes you haven’t seen yet come first.")
-                .font(.system(size: 10)).foregroundStyle(.tertiary).lineSpacing(3)
         }
     }
 
-    private func moduleDescription(_ module: ModuleID) -> LocalizedStringKey {
-        switch module {
-        case .music: return "Spotify · The track and playback controls"
-        case .timer: return "A short break or some focus time"
-        case .calendar: return "Upcoming events and meeting links"
-        case .todos: return "Keep track of home, personal and work tasks"
-        }
-    }
-
-    private func moduleBinding(_ module: ModuleID) -> Binding<Bool> {
-        switch module {
-        case .music: return $preferences.musicEnabled
-        case .timer: return $preferences.timerEnabled
-        case .calendar: return $preferences.calendarEnabled
-        case .todos: return $preferences.todosEnabled
-        }
-    }
-
-    private var appearance: some View {
+    private var general: some View {
         Group {
-            heading("Right where it belongs.", subtitle: "How Brimlet behaves on your screen.")
-            VStack(alignment: .leading, spacing: 18) {
+            Section {
+                HStack(spacing: 10) {
+                    Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 32, height: 32)
+                    UpdateRow(updater: updater)
+                }
+                settingToggle("Check for updates automatically", detail: "Once a day Brimlet asks GitHub for the latest version number.", value: $updater.automatic)
+            }
+            Section {
+                settingToggle("Open at Login", detail: "Starts Brimlet when you log in.", value: loginBinding)
+                if let loginError { Text(loginError).font(.system(size: 11)).foregroundStyle(.orange) }
+            }
+            Section {
                 Picker("Display", selection: $preferences.displayID) {
                     Text("Automatic · Notched display first").tag("auto")
                     ForEach(model.availableDisplays, id: \.id) { display in Text(display.name).tag(display.id) }
                     if preferences.displayID != "auto" && !model.availableDisplays.contains(where: { $0.id == preferences.displayID }) {
                         Text("Chosen display isn’t connected").tag(preferences.displayID)
                     }
-                }.font(.system(size: 12))
-                Text("If the display goes away, Brimlet moves to another one. On displays without a notch it shows as a small capsule.")
-                    .font(.system(size: 11)).foregroundStyle(.secondary).lineSpacing(4)
-                Divider()
+                }
+                footnote("If the display goes away, Brimlet moves to another one. On displays without a notch it shows as a small capsule.")
                 settingToggle("Expand on hover", detail: "You can also click it open.", value: $preferences.expandOnHover)
                 settingToggle("Hide in full screen", detail: "Leaves the space empty when an app fills the screen.", value: $preferences.hideInFullscreen)
-            }.padding(18).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 13))
-            Text("Brimlet follows the Reduce Motion setting of macOS. Click its top bar to close it, or press Esc while it has keyboard focus.")
-                .font(.system(size: 11)).foregroundStyle(.secondary).lineSpacing(4)
-            Button("Show Brimlet") {
-                model.hidden = false
-                model.expand()
-            }.buttonStyle(MintButtonStyle())
-        }
-    }
-
-    private var general: some View {
-        Group {
-            heading("Simple and local.", subtitle: "No account needed.")
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Text("Open at Login").font(.system(size: 12, weight: .medium))
-                    Spacer()
-                    Toggle("Open at Login", isOn: loginBinding).labelsHidden().toggleStyle(.switch).controlSize(.small)
-                }
-                if let loginError { Text(loginError).font(.system(size: 11)).foregroundStyle(.orange) }
-            }.frame(maxWidth: .infinity, alignment: .leading).padding(18).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 13))
-            VStack(alignment: .leading, spacing: 14) {
-                settingToggle("Check for updates automatically", detail: "Once a day Brimlet asks GitHub for the latest version number.", value: $updater.automatic)
-                Divider()
-                UpdateRow(updater: updater)
-            }.padding(18).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 13))
-            VStack(alignment: .leading, spacing: 10) {
-                Label("Privacy", systemImage: "lock.shield").font(.system(size: 12, weight: .semibold))
-                Text("Brimlet asks for macOS Automation access only when you connect Spotify. It uses it to read the current track and control playback.")
-                    .font(.system(size: 11)).foregroundStyle(.secondary).lineSpacing(4)
-                Text("Album art comes from Spotify’s servers and lyrics from LRCLIB. There is no account and no analytics, and nothing is sent to a server of ours.")
-                    .font(.system(size: 11)).foregroundStyle(.secondary).lineSpacing(4)
-            }.frame(maxWidth: .infinity, alignment: .leading).padding(18).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 13))
-            Text("The timer runs while Brimlet is open and ends when you quit it.")
-                .font(.system(size: 11)).foregroundStyle(.secondary).lineSpacing(4)
+                Button("Show Brimlet") { model.hidden = false; model.expand() }
+            } header: { Text("On Screen") } footer: {
+                footnote("Brimlet follows the Reduce Motion setting of macOS. Click its top bar to close it, or press Esc while it has keyboard focus.")
+            }
+            Section {
+                Label("No account, no analytics.", systemImage: "lock.shield")
+                footnote("Brimlet asks for macOS Automation access only when you connect Spotify. It uses it to read the current track and control playback.")
+                footnote("Album art comes from Spotify’s servers and lyrics from LRCLIB. There is no account and no analytics, and nothing is sent to a server of ours.")
+            }
         }
     }
 
@@ -324,22 +321,55 @@ struct SettingsView: View {
         })
     }
 
-    private func heading(_ title: LocalizedStringKey, subtitle: LocalizedStringKey) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.system(size: 24, weight: .semibold, design: .rounded))
-            Text(subtitle).font(.system(size: 12)).foregroundStyle(.secondary)
-        }.padding(.top, 9)
+    private func moduleDescription(_ module: ModuleID) -> LocalizedStringKey {
+        switch module {
+        case .music: return "Spotify · The track and playback controls"
+        case .timer: return "A short break or some focus time"
+        case .calendar: return "Upcoming events and meeting links"
+        case .todos: return "Keep track of home, personal and work tasks"
+        }
+    }
+
+    private func moduleBinding(_ module: ModuleID) -> Binding<Bool> {
+        switch module {
+        case .music: return $preferences.musicEnabled
+        case .timer: return $preferences.timerEnabled
+        case .calendar: return $preferences.calendarEnabled
+        case .todos: return $preferences.todosEnabled
+        }
+    }
+
+
+    private func footnote(_ text: LocalizedStringKey) -> some View {
+        Text(text).font(.system(size: 11)).foregroundStyle(.secondary)
+            .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func settingToggle(_ title: LocalizedStringKey, detail: LocalizedStringKey, value: Binding<Bool>) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(.system(size: 12, weight: .medium))
-                Text(detail).font(.system(size: 10)).foregroundStyle(.secondary)
+        Toggle(isOn: value) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                footnote(detail)
+            }
+        }.toggleStyle(.switch)
+    }
+}
+
+private struct AllowedApplicationRow: View {
+    let id: String
+    let remove: () -> Void
+    @State private var url: URL?
+
+    var body: some View {
+        HStack(spacing: 10) {
+            if let url { Image(nsImage: NSWorkspace.shared.icon(forFile: url.path)).resizable().frame(width: 24, height: 24) }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(url.map { FileManager.default.displayName(atPath: $0.path) } ?? id)
+                if url != nil { Text(id).font(.system(size: 11)).foregroundStyle(.secondary) }
             }
             Spacer()
-            Toggle(title, isOn: value).labelsHidden().toggleStyle(.switch).controlSize(.small)
-        }
+            Button("Remove", action: remove)
+        }.onAppear { url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: id) }
     }
 }
 
@@ -357,17 +387,17 @@ private struct UpdateRow: View {
                     case .opening:
                         detail("Drag Brimlet from the disk image to Applications and replace this version.")
                     case .failed(let reason):
-                        Text(reason).font(.system(size: 10)).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
+                        Text(reason).font(.system(size: 11)).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
                     default:
                         HStack(spacing: 4) {
                             detail("You have \(updater.current.description).")
-                            Link("Release Notes", destination: release.page).font(.system(size: 10))
+                            Link("Release Notes", destination: release.page).font(.system(size: 11))
                         }
                     }
                 }
                 Spacer(minLength: 0)
                 Button("Download and Install") { updater.install() }
-                    .buttonStyle(MintButtonStyle()).disabled(busy)
+                    .buttonStyle(.borderedProminent).disabled(busy)
                     .help("Downloads the disk image and opens it, then Brimlet quits so you can drag the new version to Applications.")
             }
         } else {
@@ -378,7 +408,7 @@ private struct UpdateRow: View {
                     case .checking: detail("Checking for updates…")
                     case .upToDate: detail("This is the latest version.")
                     case .checkFailed(let reason):
-                        Text("Couldn’t check for updates. \(reason)").font(.system(size: 10)).foregroundStyle(.orange)
+                        Text("Couldn’t check for updates. \(reason)").font(.system(size: 11)).foregroundStyle(.orange)
                             .fixedSize(horizontal: false, vertical: true)
                     default:
                         if let lastCheck = updater.lastCheck {
@@ -402,6 +432,6 @@ private struct UpdateRow: View {
     }
 
     private func detail(_ text: LocalizedStringKey) -> some View {
-        Text(text).font(.system(size: 10)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+        Text(text).font(.system(size: 11)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
     }
 }

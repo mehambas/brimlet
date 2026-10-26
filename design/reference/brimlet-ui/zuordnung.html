@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brimlet · Zuordnung, Maße und Türkisch-Test</title>
+<link rel="icon" href="assets/brimlet-32.png">
+<link rel="stylesheet" href="brimlet.css">
+<link rel="stylesheet" href="board.css">
+<style>
+.ok { color: var(--b-good); font-weight: 600; }
+.tight { color: var(--b-warn); font-weight: 600; }
+.legend-p { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; font: 400 13px/18px var(--font-text); color: var(--b-ink-2); align-items: center; }
+</style>
+</head>
+<body>
+<header class="b-top"><div class="b-top-in"><a class="b-brand" href="index.html"><img src="assets/brimlet-256.png" alt="" width="26" height="26">Brimlet <span>UI-Redesign</span></a>
+<nav class="b-pages" aria-label="Seiten"><a href="index.html">Übersicht</a><a href="insel.html">Insel</a><a href="einstellungen.html">Einstellungen</a><a href="system.html">Designsystem</a><a href="zuordnung.html" aria-current="page">Zuordnung</a></nav></div></header>
+
+<main class="board" data-od-id="mapping-board">
+  <p class="b-eyebrow">Nichts fällt weg · jedes Bedienelement mit altem und neuem Ort</p>
+  <h1 class="b-h1">Zuordnung, Maße und Türkisch</h1>
+  <p class="b-lead">Alle heutigen Funktionen bleiben, auch die selten genutzten. Neu sind nur Anzeigen, die vorhandene Daten zeigen (Kalenderfarbe, App-Name), und kurze Hilfetexte. Diese Seite ist die Prüfliste für die Umsetzung.</p>
+  <nav class="b-jump" aria-label="Abschnitte"><a href="#tabelle">Funktion → Ort</a><a href="#masse">Maße</a><a href="#tr">Türkisch-Längentest</a><a href="#offen">Offen</a></nav>
+
+  <section class="b-section" id="tabelle" aria-labelledby="t-h"><h2 class="b-title" id="t-h"><span class="b-num">1</span>Funktion → neuer Ort</h2>
+    <div class="legend-p"><span class="pill">unverändert</span> gleiche Stelle, gleiches Verhalten, neue Gestaltung <span class="pill is-move">verschoben</span> anderer Ort <span class="pill is-new">neu · Anzeige</span> zeigt Vorhandenes, ohne neue Funktion <span class="pill is-warn">entfällt</span> nur Dekoration</div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Funktion</th><th>Heute</th><th>Neu</th><th>Art</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+
+  <section class="b-section" id="masse" aria-labelledby="m-h"><h2 class="b-title" id="m-h"><span class="b-num">2</span>Maße und kleine Bildschirme</h2>
+    <p class="b-note">Die Insel behält jedes Maß. Nur die Systemfenster werden kleiner oder passen sich ihrem Inhalt an.</p>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Element</th><th>Heute</th><th>Neu</th><th>Begründung</th><th>Kleine Bildschirme</th></tr></thead><tbody>
+      <tr><td>Kapsel ohne Notch</td><td class="mut">218 × 36, 8 pt unter der Kante</td><td>gleich</td><td class="mut">—</td><td class="mut">—</td></tr>
+      <tr><td>Kompakt mit Notch</td><td class="mut">Notch + 108 × max(32, Inset)</td><td>gleich</td><td class="mut">—</td><td class="mut">—</td></tr>
+      <tr><td>Aufgeklappt</td><td class="mut">432 (begrenzt auf Bildschirm − 32) × Kopf + 236</td><td>gleich</td><td class="mut">Alle Inhalte passen in 192 pt nach der Tableiste</td><td class="mut">unverändert begrenzt</td></tr>
+      <tr><td>Songtexte</td><td class="mut">+ 164</td><td>gleich</td><td class="mut">vier Zeilen à 19 pt + Kopf</td><td class="mut">gesamt 438 pt bei Notch 38</td></tr>
+      <tr><td>Peek</td><td class="mut">+ 66</td><td>gleich</td><td class="mut">—</td><td class="mut">—</td></tr>
+      <tr><td>Einstellungen</td><td class="mut">700 × 550 fest</td><td>520 × 290–620, darüber scrollen</td><td class="mut">Findlings Breite; fünf Tabs passen mit Türkisch; Höhe folgt dem Tab wie in Mac-Einstellungen</td><td class="mut">kleinster Mac (MacBook Air 13″, 1440 × 900 Standard): Fenster bis 696 pt hoch statt 578, aber 180 pt schmaler</td></tr>
+      <tr><td>Aufgabe hinzufügen</td><td class="mut">360 × 350 fest</td><td>360 × 282 (ohne Datum) – 368 (mit Datum)</td><td class="mut">Datum und Erinnerung erscheinen erst bei Bedarf</td><td class="mut">kleiner als heute ohne Datum</td></tr>
+      <tr><td>Zitatkarte</td><td class="mut">≤ 400 × Inhalt, Text 90–480</td><td>gleich</td><td class="mut">—</td><td class="mut">Text begrenzt auf Bildschirmhöhe − 192 (wie heute)</td></tr>
+    </tbody></table></div></section>
+
+  <section class="b-section" id="tr" aria-labelledby="tr-h"><h2 class="b-title" id="tr-h"><span class="b-num">3</span>Türkisch-Längentest</h2>
+    <p class="b-note">Gemessen in deinem Browser mit SF Pro in der jeweiligen Größe gegen den tatsächlich verfügbaren Platz. Die Türkisch-Texte stammen aus <code>Resources/tr.lproj/Localizable.strings</code>, neue Texte sind markiert.</p>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Stelle</th><th>Englisch</th><th>Türkisch</th><th>Schrift</th><th>benötigt EN / TR</th><th>verfügbar</th><th>Ergebnis</th></tr></thead><tbody id="tr-rows"></tbody></table></div>
+    <h3 class="b-sub">Die engsten Stellen im Bild</h3>
+    <div class="gal" id="tr-gal"></div></section>
+
+  <section class="b-section" id="offen" aria-labelledby="o-h"><h2 class="b-title" id="o-h"><span class="b-num">4</span>Offen für die Umsetzung</h2>
+    <ul class="b-points">
+      <li><b>Dokumentation:</b> README und <code>docs/external-notifications.md</code> nennen „Settings › Modules › Allow an App…“ und die vier alten Tabs. Nach der Umsetzung auf „Settings › Notifications“ und die fünf Tabs ändern.</li>
+      <li><b>Kalenderfarbe:</b> <code>CalendarEvent</code> braucht ein Feld für die Farbe (aus <code>EKCalendar.cgColor</code>, nur lesen). Ohne das Feld bleibt der Punkt weg; sonst ändert sich nichts.</li>
+      <li><b>Neue Texte (EN/TR):</b> „Starts Brimlet when you log in.“, „On Screen“, „Small View“, „Not connected“, „Turn on Music to connect Spotify.“, „Calendar is off“, „Turn On“, „No apps allowed yet“, „Notifications“ (Tab), „“%@” completed“, „macOS asks for permission the first time.“, „Plain“. Türkische Vorschläge stehen in <code>ui.js</code> (Tabelle <code>TR</code>) und brauchen eine muttersprachliche Durchsicht.</li>
+      <li><b>Segmentsteuerung in der Insel:</b> eigene Buttons mit <code>accessibilityRepresentation</code>, weil <code>Picker(.segmented)</code> auf dem schwarzen Panel nur grau gezeichnet wird.</li>
+      <li><b>macOS 26:</b> Tahoe zeichnet Toolbar-Tabs und Tasten in Kapselform; Gliederung und Abstände bleiben gleich, die Insel ist davon nicht betroffen.</li>
+      <li><b>Nicht gezeigt, weil unverändert:</b> Willkommen-Aufklappen beim ersten Start, Verhalten bei abgehängtem Display, Ausblenden im Vollbild.</li>
+    </ul></section>
+
+  <p class="b-foot">Messungen hängen von der installierten Schrift ab; auf einem Mac misst der Browser SF Pro. Unter anderen Systemen fällt er auf eine Ersatzschrift zurück, die Werte sind dann nur Näherungen.</p>
+</main>
+
+<script src="ui.js"></script>
+<script>
+(() => {
+'use strict';
+const B = window.BUI; const $ = (s) => document.querySelector(s);
+const P = { u: '<span class="pill">unverändert</span>', m: '<span class="pill is-move">verschoben</span>', n: '<span class="pill is-new">neu · Anzeige</span>', x: '<span class="pill is-warn">entfällt</span>' };
+const groups = [
+  ['Insel', [
+    ['Kompakt: Cover oder Modulsymbol, Status rechts', 'Kopf links / rechts', 'Kopf links / rechts; Mint nur für Laufendes', 'u'],
+    ['cmux-Zahl', 'am Cover', 'am Cover, 16 pt, 11 pt Ziffer', 'u'],
+    ['Aufklappen per Klick, Zeigen (180 ms), Zuklappen beim Verlassen (0,6 s), Klick daneben, Esc', 'Insel', 'Insel', 'u'],
+    ['Tabs je Modul, Titel weichen bei Platzmangel', 'Tableiste', 'Tableiste, 26 pt, eckiger Radius 8', 'u'],
+    ['Punkt am Timer-Tab, solange er läuft', 'Tab', 'Tab', 'u'],
+    ['Wartende cmux-Sitzungen', 'Chip in der Tableiste', 'Chip in der Tableiste', 'u'],
+    ['Einstellungen öffnen', 'Zahnrad rechts', 'Zahnrad rechts', 'u'],
+    ['Wortmarke „BRIMLET“', 'Tableiste rechts', '—', 'x'],
+    ['Leere Insel, „Module wählen“', 'Inhalt', 'Inhalt', 'u'],
+  ]],
+  ['Musik', [
+    ['Cover, Titel, Interpret', 'Karte', 'Karte', 'u'],
+    ['Quelle Spotify', 'Etikett „• SPOTIFY“ 8 pt', 'Quellzeile „Spotify“ 11 pt', 'u'],
+    ['In Spotify öffnen', '↗ rechts', '↗ rechts', 'u'],
+    ['Spulen per Zeitleiste, VoiceOver ±5 s', 'Zeitleiste', 'Zeitleiste', 'u'],
+    ['Vorheriger, Wiedergabe/Pause, Nächster', 'Transportzeile', 'Transportzeile, Wiedergabe in Mint', 'u'],
+    ['Songtexte ein/aus, synchron/einfach/lädt/keiner', 'Taste rechts, Fläche darunter', 'Taste rechts, Fläche darunter', 'u'],
+    ['Verbinden, Spotify öffnen, Berechtigung, Erneut versuchen', 'leere Karte', 'leere Karte, ein Muster', 'u'],
+    ['Peek bei Trackwechsel mit Steuerung und Songtext', 'Peek', 'Peek; Klickflächen getrennt sichtbar', 'u'],
+  ]],
+  ['Timer', [
+    ['5 / 15 / 25 / 45 Minuten', 'vier Kapseln', 'Segmentsteuerung', 'u'],
+    ['Starten, Pause, Fortsetzen, Zurücksetzen, Neu starten', 'Karte', 'Karte', 'u'],
+    ['Ende: Peek 6 s, optional Ton', 'Peek', 'Peek', 'u'],
+  ]],
+  ['Kalender', [
+    ['Heute / Morgen / 7 Tage', 'Segmentsteuerung', 'Segmentsteuerung', 'u'],
+    ['Aktualisieren, Kalender öffnen', 'Symbole rechts', 'Symbole rechts', 'u'],
+    ['Termin: Titel, Zeit, Kalender, Status', 'drei Zeilen', 'zwei Zeilen', 'u'],
+    ['Kalenderfarbe', '—', 'Punkt vor dem Kalendernamen', 'n'],
+    ['Beitreten (Meet, Zoom, Teams, Webex)', 'Mint-Taste je Termin', 'Mint nur ≤ 10 min vor Beginn oder laufend, sonst neutral', 'u'],
+    ['Im Kalender zeigen', 'Zeile und ↗', 'Zeile und ↗', 'u'],
+    ['Zugriff, Laden, Leer, Fehler', 'Karte / orange Zeile', 'Karte / Hinweis über der Liste', 'u'],
+    ['Erinnerung mit Beitreten', 'Peek', 'Peek', 'u'],
+  ]],
+  ['Aufgaben', [
+    ['Alle / Zuhause / Persönlich / Arbeit', 'Chips', 'Segmentsteuerung', 'u'],
+    ['Erledigte / Offene zeigen', 'Textlink oben', 'Umschalter rechts', 'm'],
+    ['Neue Aufgabe', '+ oben rechts', '+ oben rechts, Mint', 'u'],
+    ['Erledigen, Rückgängig (8 s)', 'Kreis, Link oben', 'Kreis, Hinweis unten', 'm'],
+    ['Löschen (erledigte)', 'Papierkorb in der Zeile', 'Papierkorb in der Zeile', 'u'],
+    ['Titel, Notiz, Kategorie, Datum, Erinnerung 9:00, Abbrechen, Hinzufügen', 'Sheet 360 × 350, dunkel', 'Sheet 360 breit, System-Erscheinungsbild', 'u'],
+  ]],
+  ['Zitate, fremde Apps, cmux', [
+    ['Zitatkarte am rechten Rand, Zeiger hält sie, ×, „Schließen“', 'eigene Karte, dunkel', 'eigene Karte, System-Erscheinungsbild', 'u'],
+    ['Zitat speichern über Dienste: Text, Autor, Quelle, Sichern', 'Karte', 'Karte', 'u'],
+    ['Benachrichtigung fremder App, Klick schließt', 'Peek', 'Peek', 'u'],
+    ['cmux-Liste, Sitzung öffnen, cmux-Peek', 'Inhalt / Peek', 'Inhalt / Peek', 'u'],
+  ]],
+  ['Einstellungen · aus „Modules“', [
+    ['Module ein/aus', 'Modules', 'Module › Module', 'u'],
+    ['Reihenfolge', 'Modules, Pfeiltasten', 'Module › Module, Ziehen + Kontextmenü + VoiceOver-Aktionen', 'u'],
+    ['Musik vorn halten · Trackwechsel zeigen', 'Modules', 'Module › Kleine Ansicht', 'm'],
+    ['Ton bei Timer-Ende', 'Modules', 'Module › Timer', 'm'],
+    ['Mit Spotify verbinden / trennen', 'Modules', 'Module › Musik', 'm'],
+    ['Termin-Erinnerung, Alle Kalender, Kalenderauswahl', 'Modules (nur wenn Kalender an)', 'Kalender', 'm'],
+    ['Erlaubte Apps, „App erlauben…“, „Entfernen“, Fehler', 'Modules', 'Mitteilungen', 'm'],
+    ['cmux-Sitzungen zeigen', 'Modules', 'Mitteilungen › cmux', 'm'],
+    ['Hinweise zu Kalenderzugriff und Timer-Reset', 'Modules, Fuß', 'Kalender bzw. Module › Timer, jeweils Fußzeile', 'm'],
+  ]],
+  ['Einstellungen · aus „Appearance“', [
+    ['Display (mit „nicht verbunden“)', 'Appearance', 'Allgemein › Auf dem Bildschirm', 'm'],
+    ['Beim Zeigen aufklappen · Im Vollbild ausblenden', 'Appearance', 'Allgemein › Auf dem Bildschirm', 'm'],
+    ['Hinweis Reduce Motion / Esc · Brimlet zeigen', 'Appearance', 'Allgemein › Auf dem Bildschirm, Fußzeile', 'm'],
+  ]],
+  ['Einstellungen · „General“ und „Quotes“', [
+    ['Beim Anmelden öffnen, Fehler, Freigabe nötig', 'General', 'Allgemein, zweite Gruppe', 'u'],
+    ['Automatisch nach Updates suchen', 'General', 'Allgemein, erste Gruppe', 'u'],
+    ['Update-Zeile mit allen Zuständen, Jetzt prüfen, Versionshinweise, Laden und installieren', 'General', 'Allgemein, ganz oben mit App-Symbol', 'u'],
+    ['Datenschutz', 'General, Karte', 'Allgemein, Fußzeile', 'u'],
+    ['„Timer läuft, solange Brimlet offen ist“', 'General', 'Module › Timer, Fußzeile', 'm'],
+    ['Ab und zu ein Zitat · Wie oft · Wie lange · Hinweis', 'Quotes', 'Zitate', 'u'],
+    ['Gespeicherte Zitate, Anzahl, Jetzt zeigen, Löschen, Anleitung, Speicherhinweis', 'Quotes', 'Zitate', 'u'],
+  ]],
+  ['Seitenleiste und Menü', [
+    ['App-Symbol, Name', 'Seitenleiste', 'Allgemein, Update-Zeile', 'm'],
+    ['„A little room up top.“', 'Seitenleiste', '—', 'x'],
+    ['„No account, no analytics.“', 'Seitenleiste', 'Allgemein, Datenschutz-Titel', 'm'],
+    ['Version', 'Seitenleiste', 'Allgemein, Update-Zeile', 'm'],
+    ['Erlaubte App: Name und Symbol', '— (nur Bundle-ID)', 'Mitteilungen, aus der App gelesen', 'n'],
+    ['Menüleiste: Update auf …, Öffnen, Ein-/Ausblenden, Einstellungen…, Nach Updates suchen…, Beenden', 'NSMenu', 'NSMenu', 'u'],
+  ]],
+];
+$('#rows').innerHTML = groups.map(([g, rows]) => `<tr class="grp"><td colspan="4">${g}</td></tr>` + rows.map(([f, a, b, k]) => `<tr><td>${f}</td><td class="mut">${a}</td><td>${b}</td><td>${P[k]}</td></tr>`).join('')).join('');
+
+const cv = (() => { try { return document.createElement('canvas').getContext('2d'); } catch (e) { return null; } })();
+const W = (txt, font) => {
+  if (cv) { cv.font = font; return Math.ceil(cv.measureText(txt).width); }
+  const size = +(font.match(/(\d+)px/) || [0, 13])[1];
+  return Math.ceil(txt.length * size * 0.56);
+};
+const f12m = '500 12px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif', f12s = '600 12px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif', f13 = '400 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif', f11 = '400 11px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif', f13s = '600 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+const t = (k, l) => B.t(k, l);
+const tabsNeed = (l) => ['Music', 'Timer', 'Calendar', 'Tasks'].reduce((s, k) => s + 39 + W(t(k, l), f12m), 0) + 12 + 32;
+const rows = [
+  ['Insel: vier Tabs mit Titeln + Zahnrad', 'Music … Tasks', 'Müzik … Yapılacaklar', '12 medium', tabsNeed('en'), tabsNeed('tr'), 400, 'Bei Platzmangel nur der gewählte Tab mit Titel (wie heute über ViewThatFits)'],
+  ['Insel: Taste im leeren Zustand', 'I’ve allowed it, try again', 'İzin verdim, yeniden dene', '12 medium', W(t('I’ve allowed it, try again', 'en'), f12m) + 8, W(t('I’ve allowed it, try again', 'tr'), f12m) + 8, 300],
+  ['Insel: Hauptaktion Timer', 'Start Timer', 'Zamanlayıcıyı başlat', '12 semibold', W('Start Timer', f12s) + 28, W(t('Start Timer', 'tr'), f12s) + 28, 392],
+  ['Insel: leerer Kalender', 'Choose which calendars to show in Settings.', t('Choose which calendars to show in Settings.', 'tr'), '12 regular', W(t('Choose which calendars to show in Settings.', 'en'), '400 12px -apple-system'), W(t('Choose which calendars to show in Settings.', 'tr'), '400 12px -apple-system'), 300, 'bricht bei Bedarf ausgewogen um (text-wrap: balance)'],
+  ['Insel: Aufgabenfilter (ein Segment)', 'Personal', 'Kişisel', '12 medium', W('Personal', f12m) + 16, W('Kişisel', f12m) + 16, 72],
+  ['Insel: Rückgängig-Hinweis', '“Pay the electricity bill” completed', '“Elektrik faturasını öde” tamamlandı', '13 medium', W('“Pay the electricity bill” completed', '500 13px -apple-system'), W('“Elektrik faturasını öde” tamamlandı', '500 13px -apple-system'), 300, 'längere Titel werden mit … gekürzt'],
+  ['Einstellungen: Tableiste', 'General … Quotes', 'Genel … Özlü sözler', '11 regular', B.TABS.reduce((s, x) => s + Math.max(72, W(t(x[1], 'en'), f11) + 16) + 2, 0), B.TABS.reduce((s, x) => s + Math.max(72, W(t(x[1], 'tr'), f11) + 16) + 2, 0), 496],
+  ['Einstellungen: längste Zeile', 'Check for updates automatically', 'Güncellemeleri otomatik denetle', '13 regular', W('Check for updates automatically', f13), W(t('Check for updates automatically', 'tr'), f13), 420],
+  ['Einstellungen: Display-Popup', 'Automatic · Notched display first', 'Otomatik · Önce çentikli ekran', '13 regular', W('Automatic · Notched display first', f13) + 33, W(t('Automatic · Notched display first', 'tr'), f13) + 33, 260],
+  ['Einstellungen: Hauptaktion Spotify', 'Connect to Spotify', 'Spotify’a bağlan', '13 medium', W('Connect to Spotify', '500 13px -apple-system') + 20, W(t('Connect to Spotify', 'tr'), '500 13px -apple-system') + 20, 200],
+  ['Einstellungen: Update-Taste', 'Download and Install', 'İndir ve kur', '13 medium', W('Download and Install', '500 13px -apple-system') + 20, W(t('Download and Install', 'tr'), '500 13px -apple-system') + 20, 180],
+  ['Aufgabenblatt: Kategorie', 'Home · Personal · Work', 'Ev · Kişisel · İş', '13 regular', ['Home', 'Personal', 'Work'].reduce((s, k) => s + W(k, f13) + 16, 0), ['Ev', 'Kişisel', 'İş'].reduce((s, k) => s + W(k, f13) + 16, 0), 210],
+  ['Aufgabenblatt: Erinnerung', 'Remind me at 9:00 that morning', 'Sabah 09.00’da hatırlat', '13 regular', W('Remind me at 9:00 that morning', f13), W(t('Remind me at 9:00 that morning', 'tr'), f13), 270],
+  ['Zitatkarte: Etikett', 'Add to Brimlet as Quote', 'Brimlet’e söz olarak ekle', '12 semibold', W('Add to Brimlet as Quote', f12s) + 19, W(t('Add to Brimlet as Quote', 'tr'), f12s) + 19, 300],
+];
+$('#tr-rows').innerHTML = rows.map(([where, en, tr, font, ne, nt, av, note]) => {
+  const fits = Math.max(ne, nt) <= av;
+  return `<tr><td>${where}</td><td class="mut">${B.esc(en)}</td><td>${B.esc(tr)}</td><td class="mut">${font}</td><td class="mut" style="font-variant-numeric:tabular-nums;white-space:nowrap">${ne} / ${nt} pt</td><td class="mut" style="font-variant-numeric:tabular-nums">${av} pt</td><td>${fits ? '<span class="ok">passt</span>' : '<span class="tight">angepasst</span>'}${note ? `<br><span class="mut">${note}</span>` : ''}</td></tr>`;
+}).join('');
+
+const gal = $('#tr-gal');
+const add = (html, cap) => { const el = document.createElement('figure'); el.className = 'fig'; el.innerHTML = `<div class="scroll-x" inert>${html}</div><figcaption class="fig-cap">${cap}</figcaption>`; gal.appendChild(el); };
+const isl = (o) => B.desk({ lang: 'en', notch: true, music: { conn: 'playing', elapsed: 92 }, timer: { phase: 'idle', sel: 25 }, cal: { access: 'ready' }, noAnim: true, ...o }, { width: 500, bare: true });
+add(isl({ mode: 'expanded', module: 'music' }), '<b>EN.</b> Alle Tabs mit Titel.');
+add(isl({ mode: 'expanded', module: 'timer', lang: 'tr' }), '<b>TR.</b> Nur der gewählte Tab trägt seinen Titel, die anderen bleiben als Symbol mit Hilfetext.');
+add(isl({ mode: 'expanded', module: 'music', lang: 'tr', music: { conn: 'denied' } }), '<b>TR, gesperrt.</b> Längste Textaktion.');
+add(isl({ mode: 'expanded', module: 'calendar', lang: 'tr', cal: { access: 'ready', range: 'tomorrow' } }), '<b>TR, Kalender.</b> Langer Termintitel auf zwei Zeilen.');
+add(isl({ mode: 'peek', module: 'music', lang: 'tr', peek: { kind: 'external' } }), '<b>TR, fremde App.</b>');
+add(`<div class="wall" style="padding:24px;border-radius:14px;background:#7d8796 url('assets/wallpaper-sonoma-light.jpg') center/cover">${B.settings({ lang: 'tr', theme: 'light', tab: 'notifications', notif: { error: 'signature' }, cmux: true })}</div>`, '<b>TR, Bildirimler.</b> Längste Fehlermeldung in der Liste.');
+})();
+</script>
+</body>
+</html>

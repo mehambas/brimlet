@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct TodoCard: View {
@@ -11,16 +12,16 @@ struct TodoCard: View {
                 Spacer(minLength: 0)
                 if module.recentlyCompleted != nil {
                     Button("Undo") { module.undoCompletion() }
-                        .font(.system(size: 10, weight: .semibold)).buttonStyle(.plain).foregroundStyle(BrimletTheme.mint)
+                        .font(.system(size: 11, weight: .semibold)).buttonStyle(.plain).foregroundStyle(BrimletTheme.mint)
                 }
                 Button {
                     module.showCompleted.toggle()
                 } label: {
                     Text(module.showCompleted ? "Open Tasks" : "Completed")
-                        .font(.system(size: 10, weight: .medium)).foregroundStyle(BrimletTheme.mint)
+                        .font(.system(size: 11, weight: .medium)).foregroundStyle(BrimletTheme.secondary)
                 }.buttonStyle(.plain)
                 if !module.showCompleted {
-                    IconButton(symbol: "plus", help: "New Task") {
+                    IconButton(symbol: "plus", help: "New Task", prominent: true) {
                         module.isEditorPresented = true
                         showingEditor = true
                     }
@@ -39,14 +40,14 @@ struct TodoCard: View {
                     let items = module.showCompleted ? module.completedItems : module.activeItems
                     if items.isEmpty {
                         Text(module.showCompleted ? "Tasks completed in the last 30 days appear here." : "Nothing to do. Add a new task.")
-                            .font(.system(size: 10)).foregroundStyle(BrimletTheme.secondary).frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 13)
+                            .font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary).frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 13)
                     } else {
                         ForEach(items) { item in
                             HStack(spacing: 8) {
                                 Button { module.complete(item.id) } label: {
                                     Image(systemName: item.completedAt == nil ? "circle" : "checkmark.circle.fill")
                                         .font(.system(size: 15)).foregroundStyle(item.completedAt == nil ? BrimletTheme.secondary : BrimletTheme.mint)
-                                }.buttonStyle(.plain).disabled(item.completedAt != nil)
+                                }.buttonStyle(.plain).frame(width: 28, height: 28).accessibilityLabel("Complete \(item.title)").disabled(item.completedAt != nil)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(item.title).font(.system(size: 11, weight: .medium)).lineLimit(1)
                                         .strikethrough(item.completedAt != nil).foregroundStyle(item.completedAt == nil ? .white : BrimletTheme.secondary)
@@ -55,12 +56,12 @@ struct TodoCard: View {
                                         if let date = item.dueDate { Text("· \(date.formatted(.dateTime.day().month()))") }
                                         if item.reminderEnabled { Image(systemName: "bell.fill") }
                                         if !item.note.isEmpty { Text("· \(item.note)").lineLimit(1) }
-                                    }.font(.system(size: 9)).foregroundStyle(BrimletTheme.secondary)
+                                    }.font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
                                 }
                                 Spacer(minLength: 2)
                                 if item.completedAt != nil {
-                                    Button { module.remove(item.id) } label: { Image(systemName: "trash").font(.system(size: 9)).foregroundStyle(BrimletTheme.secondary) }
-                                        .buttonStyle(.plain).help("Delete")
+                                    Button { module.remove(item.id) } label: { Image(systemName: "trash").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary) }
+                                        .buttonStyle(.plain).frame(width: 28, height: 28).help("Delete").accessibilityLabel("Delete")
                                 }
                             }
                             .padding(.horizontal, 9).padding(.vertical, 6)
@@ -74,19 +75,21 @@ struct TodoCard: View {
         .padding(.horizontal, 20).frame(height: 186, alignment: .top)
         .sheet(isPresented: $showingEditor, onDismiss: { module.isEditorPresented = false }) {
             TodoEditor(module: module)
+                .environment(\.colorScheme, NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? .dark : .light)
+                .preferredColorScheme(nil)
         }
     }
 
     private func filterChip(_ title: LocalizedStringKey, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title).font(.system(size: 9, weight: .medium)).padding(.horizontal, 9).padding(.vertical, 5)
-                .foregroundStyle(selected ? BrimletTheme.mint : BrimletTheme.secondary)
-                .background(selected ? BrimletTheme.mint.opacity(0.12) : BrimletTheme.surface, in: Capsule())
+            Text(title).font(.system(size: 11, weight: .medium)).padding(.horizontal, 9).padding(.vertical, 5)
+                .foregroundStyle(selected ? BrimletTheme.primary : BrimletTheme.secondary)
+                .background(selected ? BrimletTheme.raised : BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 8))
         }.buttonStyle(.plain)
     }
 }
 
-private struct TodoEditor: View {
+struct TodoEditor: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var module: TodoModule
     @State private var title = ""
@@ -98,7 +101,7 @@ private struct TodoEditor: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 13) {
-            Text("New Task").font(.system(size: 18, weight: .semibold, design: .rounded))
+            Text("New Task").font(.system(size: 15, weight: .semibold))
             TextField("What do you need to do?", text: $title).textFieldStyle(.roundedBorder)
             TextField("Note (optional)", text: $note).textFieldStyle(.roundedBorder)
             Picker("Category", selection: $category) {
@@ -112,16 +115,16 @@ private struct TodoEditor: View {
             }
             Spacer(minLength: 0)
             HStack {
-                Button("Cancel") { dismiss() }.buttonStyle(.plain).foregroundStyle(BrimletTheme.secondary)
+                Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
                 Spacer()
                 Button("Add") {
                     module.add(title: title, note: note, category: category, dueDate: hasDate ? dueDate : nil, reminder: reminder)
                     dismiss()
-                }.buttonStyle(MintButtonStyle()).disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }.buttonStyle(.borderedProminent).keyboardShortcut(.defaultAction).disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
-        .padding(22).frame(width: 360, height: 350)
-        .background(Color(red: 0.075, green: 0.085, blue: 0.085)).foregroundStyle(.white)
-        .environment(\.colorScheme, .dark).tint(BrimletTheme.mint)
+        .padding(20).frame(width: 360, height: hasDate ? 368 : 282)
+        .background(Color(nsColor: .windowBackgroundColor)).foregroundStyle(.primary)
+        .tint(BrimletTheme.jade)
     }
 }

@@ -47,12 +47,15 @@ Brimlet checks for a new version once a day. When one is out, its menu bar menu 
 
 Point at the notch, or click it, to open Brimlet; move away, click elsewhere or press **Escape** to close it. The tabs at the top switch between the modules. While something is going on, such as a playing track, a running timer or a meeting about to start, the small view shows it.
 
-The menu bar icon opens Brimlet, hides or shows it, and opens **Settings**, which has four tabs:
+The menu bar icon opens Brimlet, hides or shows it, and opens **Settings**, which has five tabs:
 
-- **Modules**: turn music, timer, calendar and tasks on or off and change their order, track change peeks, the timer sound, the calendars to show and their reminders, and apps allowed to show notifications.
-- **Appearance**: the display Brimlet lives on, expand on hover, hide in full screen.
-- **General**: open at login, updates and what Brimlet sends where.
+- **General**: open at login, updates, display selection, expand on hover, hide in full screen and privacy.
+- **Modules**: turn music, timer, calendar and tasks on or off, reorder them by dragging or using the arrows, connect Spotify, and set track change peeks and the timer sound.
+- **Calendar**: access, calendars to show and event reminders.
+- **Notifications**: apps allowed to show notifications and, when installed, cmux sessions.
 - **Quotes**: how often a quote appears, how long it stays, and your saved quotes.
+
+Settings, task entry and quote cards follow the Mac’s light or dark appearance. The notch panel stays black, with graphite surfaces and mint controls.
 
 macOS asks for permission only when a feature needs it:
 

@@ -4,18 +4,18 @@ import BrimletCore
 struct TimerCard: View {
     @ObservedObject var module: TimerModule
     var body: some View {
-        VStack(spacing: 14) {
-            HStack(alignment: .center, spacing: 18) {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 16) {
                 ZStack {
                     Circle().stroke(BrimletTheme.surface, lineWidth: 4)
-                    Circle().trim(from: 0, to: module.countdown.phase == .idle ? 0.22 : 1 - module.countdown.progress(at: module.now))
-                        .stroke(BrimletTheme.mint, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    Circle().trim(from: 0, to: module.countdown.phase == .idle ? 0 : (module.countdown.phase == .finished ? 1 : 1 - module.countdown.progress(at: module.now)))
+                        .stroke(module.countdown.phase == .paused ? BrimletTheme.tertiary : BrimletTheme.mint, style: StrokeStyle(lineWidth: 4, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                     Image(systemName: module.countdown.phase == .finished ? "checkmark" : "timer")
-                        .font(.system(size: 22, weight: .light)).foregroundStyle(BrimletTheme.mint)
-                }.frame(width: 58, height: 58)
+                        .font(.system(size: 20, weight: .medium)).foregroundStyle(BrimletTheme.secondary)
+                }.frame(width: 56, height: 56)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(timeText).font(.system(size: 36, weight: .light, design: .rounded)).monospacedDigit()
+                    Text(timeText).font(.system(size: 34, weight: .light)).monospacedDigit()
                     Text(status).font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
                 }
                 Spacer()
@@ -31,9 +31,9 @@ struct TimerCard: View {
                         Button { module.selectedMinutes = minutes } label: {
                             Text("\(minutes) min").font(.system(size: 11, weight: .medium))
                                 .frame(maxWidth: .infinity).padding(.vertical, 7)
-                                .foregroundStyle(module.selectedMinutes == minutes ? BrimletTheme.mint : BrimletTheme.secondary)
-                                .background(module.selectedMinutes == minutes ? BrimletTheme.mint.opacity(0.12) : BrimletTheme.surface, in: Capsule())
-                        }.buttonStyle(.plain)
+                                .foregroundStyle(module.selectedMinutes == minutes ? BrimletTheme.primary : BrimletTheme.secondary)
+                                .background(module.selectedMinutes == minutes ? BrimletTheme.raised : BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 8))
+                        }.buttonStyle(.plain).accessibilityAddTraits(module.selectedMinutes == minutes ? .isSelected : [])
                     }
                 }
                 Button("Start Timer") { module.start() }.buttonStyle(MintButtonStyle())
@@ -45,10 +45,10 @@ struct TimerCard: View {
                 Text("Your music keeps playing.")
                     .font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary).padding(.top, 3)
                 Button(module.countdown.phase == .running ? "Pause" : "Resume") { module.togglePause() }
-                    .buttonStyle(MintButtonStyle())
+                    .buttonStyle(MintButtonStyle(prominent: module.countdown.phase != .running))
             }
         }
-        .padding(.horizontal, 26)
+        .padding(.horizontal, 20)
     }
 
     private var timeText: String {

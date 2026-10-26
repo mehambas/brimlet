@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brimlet · Designsystem</title>
+<link rel="icon" href="assets/brimlet-32.png">
+<link rel="stylesheet" href="brimlet.css">
+<link rel="stylesheet" href="board.css">
+<style>
+.spec { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr) auto; gap: 6px 20px; align-items: baseline; padding: 14px 18px; border-bottom: 1px solid var(--b-line); }
+.spec:last-child { border-bottom: 0; }
+.spec-k { font: 600 13px/18px var(--font-text); }
+.spec-k span { display: block; font-weight: 400; color: var(--b-ink-2); }
+.spec-v { font: 400 12px/18px var(--font-mono); color: var(--b-ink-2); text-align: right; white-space: nowrap; }
+.type-isl { background: #000; color: var(--i-label); }
+.type-isl .spec { border-color: rgba(255, 255, 255, .1); }
+.type-isl .spec-k span, .type-isl .spec-v { color: var(--i-label-2); }
+.rule { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px; align-items: start; }
+.rule .sym { width: 20px; height: 20px; color: var(--b-link); margin-top: 1px; }
+.mx { display: grid; grid-template-columns: 140px repeat(5, max-content); gap: 14px 22px; align-items: center; }
+.mx > span { font: 600 12px/16px var(--font-text); color: inherit; opacity: .7; }
+.scale { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; align-items: flex-end; }
+.scale div { display: grid; gap: 6px; justify-items: center; font: 500 12px/16px var(--font-text); color: var(--b-ink-2); }
+.scale i { display: block; background: var(--b-link); opacity: .75; border-radius: 2px; }
+.rad { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+.rad div { display: grid; gap: 8px; justify-items: center; font: 500 12px/16px var(--font-text); color: var(--b-ink-2); text-align: center; }
+.rad i { display: block; width: 72px; height: 52px; background: var(--b-card); box-shadow: inset 0 0 0 1.5px var(--b-link); }
+.icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 10px; margin-top: 16px; }
+.icon-c { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--b-card); box-shadow: 0 0 0 1px var(--b-line); }
+.icon-c .sym { width: 22px; height: 22px; justify-self: center; }
+.icon-c b { display: block; font: 600 13px/17px var(--font-mono); }
+.icon-c span { display: block; font: 400 12px/16px var(--font-text); color: var(--b-ink-2); }
+</style>
+</head>
+<body>
+<header class="b-top"><div class="b-top-in"><a class="b-brand" href="index.html"><img src="assets/brimlet-256.png" alt="" width="26" height="26">Brimlet <span>UI-Redesign</span></a>
+<nav class="b-pages" aria-label="Seiten"><a href="index.html">Übersicht</a><a href="insel.html">Insel</a><a href="einstellungen.html">Einstellungen</a><a href="system.html" aria-current="page">Designsystem</a><a href="zuordnung.html">Zuordnung</a></nav></div></header>
+
+<main class="board" data-od-id="system-board">
+  <p class="b-eyebrow">Designsystem · Werte in pt · macOS 14+ · SwiftUI und AppKit</p>
+  <h1 class="b-h1">Graphit und Glas</h1>
+  <p class="b-lead">Das Logo hat drei Materialien: einen matten Graphit-Balken, einen Tropfen aus Mint-Glas und eine kühle helle Platte. Die Oberfläche übernimmt sie als Rollen, nicht als Effekt: Graphit trägt, Glas hebt hervor, die Platte beruhigt. Für die Systemfenster gilt Findlings Disziplin.</p>
+  <nav class="b-jump" aria-label="Abschnitte"><a href="#regeln">Regeln</a><a href="#farbe">Farbe</a><a href="#typo">Typografie</a><a href="#raum">Abstände und Radien</a><a href="#tiefe">Kanten und Schatten</a><a href="#icons">Symbole</a><a href="#bewegung">Bewegung</a><a href="#zugang">Tastatur und VoiceOver</a><a href="#komponenten">Komponenten und Zustände</a><a href="#swiftui">SwiftUI/AppKit</a></nav>
+
+  <section class="b-section" id="regeln" aria-labelledby="r-h"><h2 class="b-title" id="r-h"><span class="b-num">1</span>Vier Regeln</h2>
+    <div class="b-cols">
+      <div class="b-card rule" id="r1"><div><p class="b-card-t">Mint heißt: läuft oder ist die Hauptaktion</p><p>Laufende Musik, laufender Timer, ein Termin, der jetzt stattfindet, Fortschritt im Timer-Ring und genau eine gefüllte Aktion je Ansicht. Information bleibt weiß, Nebensache grau. Höchstens zwei Mint-Stellen im Bild.</p></div></div>
+      <div class="b-card rule" id="r2"><div><p class="b-card-t">Die Insel bleibt schwarz</p><p>Sie verschmilzt mit der Notch, in hellem und dunklem Systemerscheinungsbild. Flächen darin sind Graphit aus dem Logo, nicht weißes Alpha. Hinter der Kamera liegt nichts.</p></div></div>
+      <div class="b-card rule" id="r3"><div><p class="b-card-t">Fenster sind Mac</p><p>Einstellungen, Aufgabenblatt und Zitatkarte folgen Hell/Dunkel. Gruppierte Form, Standardsteuerungen, Systemfarben für Text und Flächen; Brimlet bringt nur den Akzent mit.</p></div></div>
+      <div class="b-card rule" id="r4"><div><p class="b-card-t">11 pt ist die Untergrenze</p><p>Normaler Text 13 pt (Insel teils 12 pt), Hilfetext 11–12 pt, mindestens 4,5 : 1. Keine Versalien mit Sperrung, keine abgerundete Schrift: SF Pro, für Zitate New York.</p></div></div>
+    </div></section>
+
+  <section class="b-section" id="farbe" aria-labelledby="f-h"><h2 class="b-title" id="f-h"><span class="b-num">2</span>Farbe</h2>
+    <p class="b-note">Markenwerte stammen aus <code>Resources/Icon/Brimlet.svg</code>. Alle anderen Werte sind daraus in OKLCH abgeleitet (Farbton 165 für Mint, 255 für Graphit) und auf Kontrast geprüft. Kontraste stehen jeweils dabei.</p>
+    <h3 class="b-sub">Marke (aus dem Logo)</h3><div class="sw-grid" id="c-brand"></div>
+    <h3 class="b-sub">Insel (immer dunkel)</h3><div class="sw-grid" id="c-island"></div>
+    <h3 class="b-sub">Systemfenster: Akzent hell / dunkel</h3>
+    <p class="b-note">Text und Flächen kommen aus den Systemfarben (<code>labelColor</code>, <code>secondaryLabelColor</code>, <code>windowBackgroundColor</code>, <code>controlBackgroundColor</code>, <code>separatorColor</code>). Brimlet setzt nur diese Werte als Farbsatz im Asset-Katalog.</p>
+    <div class="sw-grid" id="c-system"></div>
+    <h3 class="b-sub">Zitatkarte</h3><div class="sw-grid" id="c-quote"></div>
+    <h3 class="b-sub">Bedeutungsfarben, die bleiben</h3>
+    <p class="b-note">Kalenderfarben kommen unverändert aus macOS (<code>EKCalendar.cgColor</code>) und erscheinen als 7-pt-Punkt. Warnungen und Fehler nutzen die Systemtöne. Keine davon wird durch Mint ersetzt.</p>
+    <div class="sw-grid" id="c-meaning"></div>
+    <h3 class="b-sub">Wo Mint steht, wo nicht</h3>
+    <div class="tbl-wrap"><table class="tbl is-narrow" style="min-width:720px"><thead><tr><th>Ansicht</th><th>Mint</th><th>Bewusst nicht mint</th></tr></thead><tbody>
+      <tr><td>Kompakt</td><td>Equalizer bei Wiedergabe, Timer-Restzeit, „Jetzt“, cmux-Zahl</td><td>Modulsymbole, Termin-Countdown, Haken nach Timer-Ende</td></tr>
+      <tr><td>Musik</td><td>Wiedergabe-Taste, aktiver Songtext-Umschalter</td><td>Zeitleiste, Quellzeile, Songtext-Etikett</td></tr>
+      <tr><td>Timer</td><td>Ring, „Timer starten“ bzw. „Fortsetzen“</td><td>„Pause“, Zeitauswahl</td></tr>
+      <tr><td>Kalender</td><td>„Beitreten“ ≤ 10 min vor Beginn oder laufend, „Läuft“</td><td>Countdown, weitere „Beitreten“, Kalendername</td></tr>
+      <tr><td>Aufgaben</td><td>Plus-Taste, Haken erledigter Aufgaben, „Rückgängig“</td><td>Filter, Kreise offener Aufgaben</td></tr>
+      <tr><td>Einstellungen</td><td>Jade: Schalter an, Häkchen, Popup-Pfeil, eine Hauptaktion, gewählter Tab</td><td>Modulsymbole, Überschriften, Links im Fließtext außer „Versionshinweise“</td></tr>
+    </tbody></table></div></section>
+
+  <section class="b-section" id="typo" aria-labelledby="t-h"><h2 class="b-title" id="t-h"><span class="b-num">3</span>Typografie</h2>
+    <p class="b-note">SF Pro (Text unter 20 pt, Display darüber), für Zitate New York. Ziffern für Zeiten und Zähler immer mit <code>.monospacedDigit()</code>. Drei Schnitte: Regular, Medium, Semibold; Light nur für die große Timer-Ziffer.</p>
+    <h3 class="b-sub">Insel</h3><div class="tbl-wrap type-isl" id="t-island"></div>
+    <h3 class="b-sub">Systemfenster und Zitatkarte</h3><div class="tbl-wrap" id="t-system"></div></section>
+
+  <section class="b-section" id="raum" aria-labelledby="ra-h"><h2 class="b-title" id="ra-h"><span class="b-num">4</span>Abstände und Radien</h2>
+    <p class="b-note">Raster von 4 pt. Die Insel hat 20 pt Innenabstand (heute 20–26 gemischt), die Tableiste 16 pt. Radien sind konzentrisch: Insel 24, Fläche 12, Zeile 10, Steuerung 8 – jeweils 2–4 pt Abstand zum äußeren Rand.</p>
+    <div class="scale" id="space"></div>
+    <div class="rad" id="radii"></div>
+    <div class="tbl-wrap"><table class="tbl is-narrow" style="min-width:720px"><thead><tr><th>Ort</th><th>Abstände</th><th>Höhe</th></tr></thead><tbody>
+      <tr><td>Insel · Tableiste</td><td class="mut">oben 6, unten 10, seitlich 16, Abstand 4</td><td class="mut">28 (Tab 26)</td></tr>
+      <tr><td>Insel · Inhalt</td><td class="mut">seitlich 20, Abstand zwischen Blöcken 12–14</td><td class="mut">192 (+ 164 mit Songtext)</td></tr>
+      <tr><td>Insel · Zeile</td><td class="mut">8 / 10, Abstand 6</td><td class="mut">mind. 36, Termin 49, Aufgabe 40</td></tr>
+      <tr><td>Insel · Peek</td><td class="mut">links 12 (Fläche + 8), rechts 16, Abstand 10</td><td class="mut">66 (Fläche 52)</td></tr>
+      <tr><td>Insel · Tasten</td><td class="mut">Text 14 seitlich</td><td class="mut">28 · Symbol 28 · Wiedergabe 40 / 30</td></tr>
+      <tr><td>Einstellungen</td><td class="mut">Form 18 / 20 / 22, Gruppenabstand 20, Zeile 7 / 10</td><td class="mut">Zeile mind. 36, Tab 48, Titel 28</td></tr>
+      <tr><td>Zitatkarte</td><td class="mut">20 / 22 / 18, Abstand 16</td><td class="mut">90–480 Text, sonst scrollen</td></tr>
+    </tbody></table></div></section>
+
+  <section class="b-section" id="tiefe" aria-labelledby="d-h"><h2 class="b-title" id="d-h"><span class="b-num">5</span>Kanten und Schatten</h2>
+    <div class="b-cols">
+      <div class="b-card"><p class="b-card-t">Insel</p><p>Kein Schatten. Eine innere Kante <code>rgba(255,255,255,.09)</code>, 1 pt, an Seiten und Unterkante; die Oberkante bleibt offen, damit die Insel mit dem Bildschirmrand verschmilzt. Flächen darin mit 1-pt-Kante <code>.08</code>.</p></div>
+      <div class="b-card"><p class="b-card-t">Glas</p><p>Die eine Lichtkante des Logos: gefüllte Mint-Flächen bekommen oben innen 1 pt Weiß mit 35–40 %. Sonst keine Verläufe, kein Leuchten, kein Weichzeichner in der Insel.</p></div>
+      <div class="b-card"><p class="b-card-t">Zitatkarte und Fenster</p><p>Zitatkarte: <code>0 18 48 −12</code> Schatten 22 % (dunkel 55 %), dazu 0,5 pt Kante. Fenster und Blatt: Systemschatten von <code>NSWindow</code>, nichts Eigenes.</p></div>
+    </div></section>
+
+  <section class="b-section" id="icons" aria-labelledby="i-h"><h2 class="b-title" id="i-h"><span class="b-num">6</span>Symbole</h2>
+    <p class="b-note">SF Symbols, Schnitt Medium in der Insel, Regular in Fenstern. Größen folgen dem Text daneben (Symbol 13 pt bei 12-pt-Tabs, 15 pt in Symboltasten, 18 pt Transport, 21 pt Toolbar). Jede Symboltaste hat <code>.help()</code> und <code>.accessibilityLabel()</code>. Kein Symbol als reine Dekoration neben Überschriften.</p>
+    <div class="icons" id="icons-list"></div></section>
+
+  <section class="b-section" id="bewegung" aria-labelledby="b-h"><h2 class="b-title" id="b-h"><span class="b-num">7</span>Bewegung</h2>
+    <div class="tbl-wrap"><table class="tbl is-narrow" style="min-width:720px"><thead><tr><th>Token</th><th>Wert</th><th>SwiftUI</th><th>Verwendung</th></tr></thead><tbody>
+      <tr><td>quick</td><td class="mut">120 ms, ease-out</td><td><code>.easeOut(duration: 0.12)</code></td><td class="mut">Hover, Drücken (Skalierung 0,97), Farbwechsel</td></tr>
+      <tr><td>fast</td><td class="mut">180 ms</td><td><code>.easeInOut(duration: 0.18)</code></td><td class="mut">Tabwechsel, Songtextzeile, Ring-Farbe</td></tr>
+      <tr><td>base</td><td class="mut">240 ms, smooth</td><td><code>.smooth(duration: 0.24)</code></td><td class="mut">Aufklappen, Peek, Songtext-Höhe (wie heute)</td></tr>
+      <tr><td>card</td><td class="mut">450 / 300 ms, 24 pt</td><td><code>NSAnimationContext</code> 0.45 / 0.3</td><td class="mut">Zitatkarte rein / raus</td></tr>
+      <tr><td>Reduce Motion</td><td class="mut">keine Bewegung</td><td><code>accessibilityReduceMotion</code></td><td class="mut">Größe springt, Inhalt blendet 150 ms über, Equalizer steht</td></tr>
+    </tbody></table></div></section>
+
+  <section class="b-section" id="zugang" aria-labelledby="z-h"><h2 class="b-title" id="z-h"><span class="b-num">8</span>Tastatur, VoiceOver, Fokus</h2>
+    <div class="b-cols">
+      <div class="b-card"><p class="b-card-t">Tastatur in der Insel</p><p>Reihenfolge: Kopf (auf-/zuklappen) → Tabs → cmux-Chip → Einstellungen → Inhalt von links oben nach rechts unten. <kbd>←</kbd> <kbd>→</kbd> wechseln zwischen Tabs, <kbd>Leertaste</kbd>/<kbd>↩</kbd> lösen aus, <kbd>Esc</kbd> schließt (wie heute, solange die Insel den Fokus hat). Im Aufgabenblatt: <kbd>↩</kbd> fügt hinzu, <kbd>Esc</kbd> bricht ab.</p></div>
+      <div class="b-card"><p class="b-card-t">VoiceOver</p><p>Jede Symboltaste trägt ein Label und dieselbe Hilfe (<code>.help</code>): „Pause“, „Nächster Titel“, „Songtext zeigen“, „Im Kalender zeigen“, „Beitreten: Weekly team sync“. Die Zeitleiste bleibt ein einstellbares Element („Titelposition, 1:32 von 5:16“, ±5 s). Timer-Ziffern werden nicht jede Sekunde vorgelesen, nur Zustandswechsel. Gewählter Tab: <code>.isSelected</code>.</p></div>
+      <div class="b-card"><p class="b-card-t">Fokus und Ziele</p><p>Fokusring 2 pt im Akzent mit 1–2 pt Abstand, auf Schwarz Mint, in Fenstern Jade, nie entfernt. Klickziele in der Insel mindestens 28 × 28 pt (Peek-Transport 28, Wiedergabe 30/40), Textaktionen 24 pt hoch über die volle Textbreite. Fenster nutzen die Standardgrößen von macOS.</p></div>
+      <div class="b-card"><p class="b-card-t">Reduce Motion und Kontrast</p><p>Mit Reduce Motion springt die Insel auf ihre Größe, Inhalte blenden 150 ms über, der Equalizer steht. „Kontrast erhöhen“ hebt die Kanten von 8 auf 20 % Weiß und label3 auf label2 an.</p></div>
+    </div></section>
+
+  <section class="b-section" id="komponenten" aria-labelledby="k-h"><h2 class="b-title" id="k-h"><span class="b-num">9</span>Komponenten und Zustände</h2>
+    <p class="b-note">Jede Steuerung in Ruhe, beim Zeigen, gedrückt, mit Tastaturfokus und gesperrt. Kontrast sinkt in keinem Zustand außer „gesperrt“. Fokus ist immer ein 2-pt-Ring im Akzent.</p>
+    <h3 class="b-sub">Insel</h3><div id="k-island" class="scroll-x"></div>
+    <h3 class="b-sub">Systemfenster · hell und dunkel</h3><div id="k-system" style="display:grid;gap:20px;margin-top:16px"></div></section>
+
+  <section class="b-section" id="swiftui" aria-labelledby="s-h"><h2 class="b-title" id="s-h"><span class="b-num">10</span>SwiftUI- und AppKit-Zuordnung</h2>
+    <p class="b-note">Was je Baustein im Code entsteht. Bestehende Architektur (NSPanel für Insel und Zitatkarte, <code>AppModel</code>, Module) bleibt; es ändern sich Ansichten, Stile und Farben.</p>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Baustein</th><th>Umsetzung</th><th>Maße und Werte</th><th>Ersetzt</th></tr></thead><tbody id="map"></tbody></table></div>
+    <h3 class="b-sub">Farben und Tastenstil</h3>
+<pre class="code">enum IslandColor {                       // immer dunkel, unabhängig vom System
+    static let surface      = Color(hex: 0x111418)
+    static let surfaceHover = Color(hex: 0x181C21)
+    static let raised       = Color(hex: 0x23282F)   // Logo-Graphit
+    static let label        = Color(hex: 0xF3F5F8)
+    static let label2       = Color(hex: 0xACB2B9)
+    static let label3       = Color(hex: 0x81878D)
+    static let accent       = Color(hex: 0x60E7B4)   // Logo-Mint
+    static let onAccent     = Color(hex: 0x04261B)
+    static let hairline     = Color.white.opacity(0.08)
+}
+// Asset-Katalog: AccentColor  hell #227F5F · dunkel #1EA87B
+//                OnAccent     hell #FFFFFF · dunkel #052A1E
+//                QuoteSurface hell #F6F9FC → #EDF2F8 · dunkel #1A1E24
+
+struct IslandButtonStyle: ButtonStyle {
+    enum Kind { case primary, secondary }
+    var kind: Kind = .primary
+    @Environment(\.isEnabled) private var enabled
+    func makeBody(configuration: Configuration) -&gt; some View {
+        configuration.label
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundStyle(kind == .primary ? IslandColor.onAccent : IslandColor.label)
+            .padding(.horizontal, 14).frame(height: 28)
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(kind == .primary ? IslandColor.accent : IslandColor.raised))
+            .overlay(alignment: .top) {               // Glaskante
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(.white.opacity(kind == .primary ? 0.35 : 0.05), lineWidth: 1)
+                    .mask(LinearGradient(colors: [.white, .clear], startPoint: .top, endPoint: .center))
+            }
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .opacity(enabled ? 1 : 0.4)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+    }
+}</pre></section>
+
+  <p class="b-foot">Kontraste nach WCAG 2.2 berechnet. Systemfarben in der Vorschau sind Annäherungen an macOS 14; in der App liefert macOS sie selbst. Symbole sind SVG-Nachbildungen der SF Symbols.</p>
+</main>
+
+<script src="ui.js"></script>
+<script>
+(() => {
+'use strict';
+const B = window.BUI; const $ = (s) => document.querySelector(s);
+const ruleIcons = ['waveform', 'display', 'gearshape', 'info.circle'];
+ruleIcons.forEach((n, i) => { $('#r' + (i + 1)).insertAdjacentHTML('afterbegin', B.sym(n)); });
+const sw = (id, items) => { $(id).innerHTML = items.map(([c, n, v, note]) => `<div class="swatch"><i style="background:${c}"></i><div><b>${n}</b><code>${v}</code>${note ? `<span>${note}</span>` : ''}</div></div>`).join(''); };
+sw('#c-brand', [['#6A7482', 'graphite-400', '#6A7482', 'Balken oben'], ['#454E5A', 'graphite-600', '#454E5A', 'Balken Mitte'], ['#232930', 'graphite-800', '#232930', 'Balken unten'], ['#9CF4CE', 'mint-300', '#9CF4CE', 'Glas, Licht'], ['#60E7B4', 'mint-400', '#60E7B4', 'Glas'], ['#25D39B', 'mint-500', '#25D39B', 'Glas, Kern'], ['#0D976D', 'mint-700', '#0D976D', 'Glas, Schatten'], ['#04261B', 'ink', '#04261B', 'Schrift auf Mint'], ['linear-gradient(#F6F9FC,#EDF2F8)', 'plate', '#F6F9FC → #EDF2F8', 'Platte']]);
+sw('#c-island', [['#000000', 'background', '#000000', 'verschmilzt mit der Notch'], ['#111418', 'surface', '#111418', 'Zeilen, Songtext-Fläche'], ['#181C21', 'surfaceHover', '#181C21', 'Hover auf Zeilen und Tabs'], ['#23282F', 'raised', '#23282F', 'gewählter Tab, neutrale Taste'], ['#F3F5F8', 'label', '#F3F5F8', '19,2 : 1 auf Schwarz'], ['#ACB2B9', 'label2', '#ACB2B9', '9,8 : 1 · 8,6 : 1 auf surface'], ['#81878D', 'label3', '#81878D', '5,8 : 1 · 5,1 : 1 auf surface'], ['#60E7B4', 'accent', '#60E7B4', '13,6 : 1 auf Schwarz'], ['#84F1C4', 'accentHover', '#84F1C4', 'L +0,04'], ['#3CD8A2', 'accentPressed', '#3CD8A2', 'L −0,05'], ['#04261B', 'onAccent', '#04261B', '10,5 : 1 auf accent'], ['#0D2019', 'accentSoft', '#0D2019', 'aktiver Umschalter, Chip'], ['#FFB340', 'warning', '#FFB340', '10,4 : 1 auf surface'], ['#FF6961', 'error', '#FF6961', '7,5 : 1 auf Schwarz']]);
+sw('#c-system', [['#227F5F', 'AccentColor · hell', '#227F5F', 'Weiß darauf 4,9 : 1 · auf Weiß 4,9 : 1'], ['#0B7252', 'Hover · hell', '#0B7252', 'auch Linkfarbe, 5,9 : 1'], ['#006548', 'Gedrückt · hell', '#006548', 'Weiß darauf 7,1 : 1'], ['#1EA87B', 'AccentColor · dunkel', '#1EA87B', 'auf #2B2B2D 4,6 : 1, Weiß-Haken 3,0 : 1'], ['#2EB889', 'Hover · dunkel', '#2EB889', ''], ['#052A1E', 'OnAccent · dunkel', '#052A1E', 'Schrift auf Akzent 5,1 : 1'], ['#60E7B4', 'Link · dunkel', '#60E7B4', '9,0 : 1 auf Gruppe']]);
+sw('#c-quote', [['linear-gradient(#F6F9FC,#EDF2F8)', 'Fläche · hell', '#F6F9FC → #EDF2F8', 'Logo-Platte'], ['#1E232A', 'Text · hell', '#1E232A', '14,0 : 1'], ['#5A6370', 'Nebentext · hell', '#5A6370', '5,4 : 1'], ['#0B7252', 'Etikett · hell', '#0B7252', '5,4 : 1'], ['#1A1E24', 'Fläche · dunkel', '#1A1E24', 'Graphit'], ['#ACB2B9', 'Nebentext · dunkel', '#ACB2B9', '7,8 : 1']]);
+sw('#c-meaning', [['#1BADF8', 'Kalender (Beispiel)', 'EKCalendar.cgColor', 'unverändert aus macOS'], ['#63DA38', 'Kalender (Beispiel)', 'EKCalendar.cgColor', ''], ['#FF2968', 'Kalender (Beispiel)', 'EKCalendar.cgColor', ''], ['light-dark(#B25000,#FFB340)', 'Warnung', 'systemOrange', 'hell 5,2 : 1 · dunkel 7,8 : 1'], ['light-dark(#C4271B,#FF6961)', 'Fehler', 'systemRed', 'hell 5,8 : 1 · dunkel 7,5 : 1']]);
+
+const spec = (rows) => rows.map(([k, sub, sample, style, v]) => `<div class="spec"><span class="spec-k">${k}<span>${sub}</span></span><span style="${style}">${sample}</span><span class="spec-v">${v}</span></div>`).join('');
+$('#t-island').innerHTML = spec([
+  ['Timer-Ziffer', 'SF Pro Display Light, Tabellenziffern', '24:12', 'font:300 34px/38px var(--font-display);font-variant-numeric:tabular-nums', '34 / 38 · −0,01 em'],
+  ['Titel', 'Musiktitel', 'Slow Tide', 'font:600 15px/20px var(--font-text)', '15 / 20 semibold'],
+  ['Text', 'Zeilentitel, Peek-Titel, leere Zustände', 'Weekly team sync', 'font:600 13px/17px var(--font-text)', '13 / 17 regular–semibold'],
+  ['Sekundär', 'Interpret, Erklärung, Tabs, Tasten', 'Harbor Lights', 'font:400 12px/16px var(--font-text);color:var(--i-label-2)', '12 / 16 regular–semibold'],
+  ['Meta', 'Zeitleiste, Termin-Metazeile, Kompakt-Status', 'in 8 min · 14:28 – 14:58', 'font:400 11px/14px var(--font-text);color:var(--i-label-2)', '11 / 14 · Untergrenze'],
+  ['Kompakt-Status', 'Restzeit, Countdown', '24:12', 'font:600 12px/1 var(--font-text);font-variant-numeric:tabular-nums;color:var(--i-accent)', '12 semibold, Tabellenziffern'],
+]);
+$('#t-system').innerHTML = spec([
+  ['Fenstertitel, Abschnitt', 'Toolbar-Titel, Gruppenüberschrift', 'On Screen', 'font:600 13px/16px var(--font-text)', '13 / 16 semibold'],
+  ['Zeile', 'LabeledContent, Toggle, Picker', 'Expand on hover', 'font:400 13px/16px var(--font-text)', '13 / 16 regular'],
+  ['Hilfetext', 'unter Zeilen, Fußzeilen', 'You can also click it open.', 'font:400 11px/14px var(--font-text);color:var(--b-ink-2)', '11 / 14 · secondaryLabel'],
+  ['Tab-Beschriftung', 'Toolbar-Tabs', 'Notifications', 'font:400 11px/13px var(--font-text)', '11 / 13'],
+  ['Zitat, Karte', 'New York', '“Words to keep you company.”', 'font:400 17px/26px var(--font-serif)', '17 / 26 regular'],
+  ['Zitat, Liste und Erfassung', 'New York', '“A sentence you want to remember.”', 'font:400 13px/18px var(--font-serif)', '13 / 18 · Editor 15 / 22'],
+]);
+$('#space').innerHTML = [4, 6, 8, 10, 12, 16, 20, 24, 32].map((n) => `<div><i style="width:${n}px;height:${n}px"></i>${n}</div>`).join('');
+$('#radii').innerHTML = [[24, 'Insel unten'], [20, 'Kapsel oben'], [16, 'Zitatkarte'], [12, 'Fläche'], [10, 'Zeile, Fenster, Gruppe'], [8, 'Steuerung Insel'], [6, 'Steuerung Fenster'], [5, 'Insel oben (Notch)']].map(([r, n]) => `<div><i style="border-radius:${r}px"></i>${r} pt<br>${n}</div>`).join('');
+const ic = [['music.note', 'Musik-Tab, Platzhalter'], ['timer', 'Timer-Tab, Ring'], ['calendar', 'Kalender-Tab, Kalender öffnen'], ['checklist', 'Aufgaben-Tab'], ['gearshape', 'Einstellungen'], ['play.fill', 'Wiedergabe 17 / 13 pt'], ['pause.fill', 'Pause'], ['backward.fill', 'Vorheriger Titel 18 / 14 pt'], ['forward.fill', 'Nächster Titel'], ['quote.bubble', 'Songtexte'], ['arrow.up.right', 'In App öffnen'], ['arrow.clockwise', 'Kalender aktualisieren'], ['arrow.counterclockwise', 'Timer zurücksetzen'], ['plus', 'Neue Aufgabe'], ['checkmark.circle', 'Erledigte zeigen'], ['checkmark.circle.fill', 'Aufgabe erledigt'], ['circle', 'Aufgabe offen'], ['trash', 'Löschen'], ['bell.fill', 'Erinnerung 11 pt'], ['bubbles', 'bubble.left.and.bubble.right.fill · cmux'], ['terminal.fill', 'cmux-Sitzung'], ['lock.shield', 'Zugriff fehlt'], ['exclamationmark.triangle.fill', 'Warnung'], ['calendar.badge.clock', 'Termin-Erinnerung'], ['quote.opening', 'Zitate'], ['square.stack.3d.up', 'Module'], ['bell.badge', 'Mitteilungen-Tab'], ['line.3.horizontal', 'Ziehgriff'], ['xmark', 'Schließen']];
+$('#icons-list').innerHTML = ic.map(([n, u]) => `<div class="icon-c">${B.sym(n)}<div><b>${n === 'bubbles' ? 'bubble.left…fill' : n}</b><span>${u}</span></div></div>`).join('');
+
+const S = B.sym; const states = ['Ruhe', 'Zeigen', 'Gedrückt', 'Fokus', 'Gesperrt'];
+const mod = ['', ' is-hov', ' is-press', ' is-focus', ''];
+const dis = (i) => i === 4 ? ' disabled' : '';
+const rowsI = [
+  ['Hauptaktion', (i) => `<button class="ibtn ibtn-p${mod[i]}"${dis(i)}>Start Timer</button>`],
+  ['Neutral', (i) => `<button class="ibtn ibtn-s${mod[i]}"${dis(i)}>Pause</button>`],
+  ['Text', (i) => `<button class="ibtn ibtn-t${mod[i]}"${dis(i)}>I’ve allowed it, try again</button>`],
+  ['Wiedergabe', (i) => `<button class="iplay${mod[i]}"${dis(i)}>${S('pause.fill')}</button>`],
+  ['Symboltaste', (i) => `<button class="iicon${mod[i]}"${dis(i)}>${S('arrow.up.right')}</button>`],
+  ['Umschalter an', (i) => `<button class="iicon is-on${mod[i]}"${dis(i)}>${S('quote.bubble')}</button>`],
+  ['Tab', (i) => i === 4 ? '<span class="i-s">—</span>' : `<button class="itab${i === 0 ? ' is-sel' : mod[i]}">${S('timer')}<span>Timer</span></button>`],
+];
+$('#k-island').innerHTML = `<div class="isl-plate" inert><div class="mx" style="color:var(--i-label)"><span></span>${states.map((s) => `<span>${s}</span>`).join('')}${rowsI.map(([n, f]) => `<span style="opacity:1;color:var(--i-label-2)">${n}</span>${[0, 1, 2, 3, 4].map((i) => `<div>${f(i)}</div>`).join('')}`).join('')}</div></div>`;
+const sysPlate = (theme) => {
+  const rows = [
+    ['Taste', (i) => `<button class="sw-btn${mod[i].replace('is-hov', '')}"${dis(i)}>Check Now</button>`],
+    ['Hauptaktion', (i) => `<button class="sw-btn is-p${mod[i]}"${dis(i)}>Connect to Spotify</button>`],
+    ['Schalter', (i) => `<button class="sw-switch${i === 3 ? ' is-focus' : ''}" aria-checked="${i !== 4 && i !== 0 ? 'true' : i === 0 ? 'false' : 'true'}"${dis(i)}></button>`],
+    ['Häkchen', (i) => `<button class="sw-check${i === 3 ? ' is-focus' : ''}" aria-checked="${i !== 0}"${dis(i)}>${S('checkmark')}</button>`],
+    ['Popup', (i) => `<button class="sw-pop${i === 3 ? ' is-focus' : ''}"${dis(i)}><span>Once a day</span><i>${S('chevron.updown')}</i></button>`],
+  ];
+  return `<figure class="fig"><div class="scroll-x"><div class="sw theme-${theme}" style="--w:auto;padding:16px" inert><div class="mx"><span></span>${states.map((s) => `<span>${s}</span>`).join('')}${rows.map(([n, f]) => `<span style="opacity:1;font-weight:400;color:var(--c-label-2)">${n}</span>${[0, 1, 2, 3, 4].map((i) => `<div>${f(i)}</div>`).join('')}`).join('')}</div></div></div><figcaption class="fig-cap"><b>${theme === 'light' ? 'Hell' : 'Dunkel'}.</b> Schalter in Ruhe aus, sonst an. „Zeigen“ hellt die Hauptaktion um ΔL 0,04 auf.</figcaption></figure>`;
+};
+$('#k-system').innerHTML = sysPlate('light') + sysPlate('dark');
+
+const map = [
+  ['Insel-Fläche', 'IslandView, Hintergrund <code>Color.black</code>, <code>IslandShape</code> unverändert, Kante als <code>strokeBorder</code> nur Seiten/unten', 'Notch: oben 5, unten 24 · Kapsel: oben 20', 'Kante rundum .075'],
+  ['Kopfzeile kompakt', 'bestehender Button; links <code>AlbumArt(22)</code> oder Symbol 15 pt Medium in label2; rechts <code>Equalizer</code> / Text 12 pt semibold <code>.monospacedDigit()</code>', 'Slots 44, Abstand = Notch-Breite', 'Symbole immer mint, SF Mono 10 pt'],
+  ['cmux-Zahl', '<code>Text</code> 11 pt bold in Capsule accent, onAccent', 'mind. 16 × 16, oben rechts am Slot', '8 pt'],
+  ['Tableiste', '<code>ViewThatFits</code> bleibt (mit/ohne Titel); <code>IslandTabStyle</code>: Höhe 26, Radius 8, raised wenn gewählt; Wortmarke entfällt', 'Symbol 13, Text 12 medium, Abstand 4', 'Capsule-Hintergrund, „BRIMLET“'],
+  ['Tasten', '<code>IslandButtonStyle(.primary/.secondary)</code>, <code>.borderless</code> für Textaktionen, <code>IslandIconButton</code> 28 × 28', '28 hoch, Radius 8', '<code>MintButtonStyle</code>'],
+  ['Wiedergabe', '<code>Circle().fill(accent)</code>, Glyph onAccent; Peek 30, Karte 40', '17 / 13 pt Glyph', 'weißer Kreis, schwarzer Glyph'],
+  ['Zeitleiste', 'bestehende <code>SeekBar</code>; Füllung label statt mint, Knopf 10 → 13 beim Zeigen', 'Spur 4 pt, Zeiten 11 pt label3', 'mint, 3 pt, 9 pt Zeiten'],
+  ['Segmentsteuerung (Insel)', 'HStack aus Buttons mit <code>.accessibilityRepresentation { Picker(…).pickerStyle(.segmented) }</code>', '26 hoch, Innenabstand 2, Radius 8 / 6', 'Picker .segmented, Kapseln im Timer'],
+  ['Zeilen', '<code>IslandRow</code>: <code>RoundedRectangle(10).fill(surface).overlay(stroke hairline)</code>, Hover → surfaceHover', 'mind. 36, Abstand 6', 'white 6,5 %'],
+  ['Leerer Zustand', '<code>IslandEmptyState(symbol, title, message, primary, secondary)</code>', 'Symbol 22 label2, Titel 13, Text 12', '<code>EmptyCard</code> mit Mint-Symbol 26'],
+  ['Timer-Ring', 'bestehend; idle ohne Bogen, pausiert label3', '56 Ø, Strich 4', 'idle mit 22-%-Bogen'],
+  ['Songtext', '<code>LyricsPanel</code>, Etikett als <code>Text</code> 11 pt in raised Capsule', 'aktive Zeile 13 semibold, sonst 12 label3', 'Versalien „SYNCED“ 8 pt'],
+  ['Hinweis (Undo)', '<code>.overlay(alignment: .bottom)</code> mit raised-Fläche, <code>.transition(.opacity)</code>, 8 s', 'Zeile 36', 'Link „Undo“ 10 pt oben'],
+  ['Einstellungsfenster', '<code>NSWindow</code> + <code>NSTabViewController(tabStyle: .toolbar)</code>, je Tab <code>NSHostingController</code>; Erscheinungsbild System', '520 breit, Höhe aus <code>preferredContentSize</code>, max. 620 + Scroll', '700 × 550, <code>darkAqua</code>, Seitenleiste'],
+  ['Tab-Inhalt', '<code>Form { Section … }.formStyle(.grouped)</code>, <code>LabeledContent</code>, <code>Toggle</code>, <code>Picker(.menu)</code>', 'Text 13, Hilfe 11 via <code>.foregroundStyle(.secondary)</code>', 'eigene Karten, 9–10 pt'],
+  ['Modulliste', '<code>ForEach(order).onMove</code> in einer Section; <code>.contextMenu</code> und <code>.accessibilityAction(named:"Move Up")</code>', 'Zeile 36+, Griff 14 label3', 'Pfeiltasten 9 pt'],
+  ['Akzent', 'Asset <code>AccentColor</code> + <code>.tint(.accentColor)</code>; Hauptaktion <code>.borderedProminent</code> mit <code>.foregroundStyle(Color("OnAccent"))</code>', 'hell #227F5F · dunkel #1EA87B', '<code>BrimletTheme.mint</code> überall'],
+  ['Erlaubte App', '<code>NSWorkspace.urlForApplication(withBundleIdentifier:)</code> → Name und Symbol (nur Anzeige)', 'Symbol 24, Name 13, ID 11', 'nur Bundle-ID'],
+  ['Kalenderfarbe', '<code>CalendarSource.color</code> aus <code>EKCalendar.cgColor</code>; im Termin <code>CalendarEvent.calendarColor</code> (neu, nur Anzeige)', 'Punkt 7 pt', '—'],
+  ['Aufgabenblatt', 'bestehendes <code>.sheet</code>, ohne erzwungenes Dunkel; Kategorie <code>Picker(.segmented)</code>; <code>.keyboardShortcut(.defaultAction)</code> / <code>.cancelAction</code>', '360 × 282–368', '360 × 350, dunkel, Titel gerundet 18'],
+  ['Zitatkarte', 'bestehendes <code>NSPanel</code>; <code>panel.appearance</code> entfernen; Fläche aus Asset <code>QuoteSurface</code>; Animation 0.45 / 0.3 s, 24 pt', '≤ 400, Radius 16', 'Radius 22, Mint-Rand und -Strich'],
+];
+$('#map').innerHTML = map.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="mut">${r[2]}</td><td class="mut">${r[3]}</td></tr>`).join('');
+})();
+</script>
+</body>
+</html>

@@ -2,12 +2,6 @@ import AppKit
 import SwiftUI
 import BrimletCore
 
-enum BrimletTheme {
-    static let mint = Color(red: 0.55, green: 0.91, blue: 0.77)
-    static let secondary = Color.white.opacity(0.48)
-    static let surface = Color.white.opacity(0.065)
-}
-
 struct IslandShape: Shape {
     var hasNotch: Bool
     func path(in rect: CGRect) -> Path {
@@ -20,6 +14,7 @@ struct IslandShape: Shape {
 struct IslandView: View {
     @ObservedObject var model: AppModel
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var contrast
 
     var body: some View {
         VStack(spacing: 0) {
@@ -37,12 +32,13 @@ struct IslandView: View {
         .clipShape(IslandShape(hasNotch: model.geometry.hasNotch))
         .overlay {
             IslandShape(hasNotch: model.geometry.hasNotch)
-                .strokeBorderCompatible(Color.white.opacity(0.075))
+                .strokeBorderCompatible(Color.white.opacity(contrast == .increased ? 0.2 : 0.09))
+                .mask(alignment: .bottom) { Rectangle().padding(.top, model.geometry.hasNotch ? 1 : 0) }
                 .allowsHitTesting(false)
         }
         .contentShape(IslandShape(hasNotch: model.geometry.hasNotch))
         .onHover { model.hover($0) }
-        .foregroundStyle(Color.white)
+        .foregroundStyle(BrimletTheme.primary)
         .environment(\.colorScheme, .dark)
         .preferredColorScheme(.dark)
         .animation(reduceMotion ? nil : .smooth(duration: 0.24), value: model.isExpanded)
@@ -59,14 +55,14 @@ struct IslandView: View {
                     } else {
                         Image(systemName: model.currentModule?.symbol ?? "circle.hexagongrid.fill")
                             .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(BrimletTheme.mint)
+                            .foregroundStyle(BrimletTheme.secondary)
                     }
                 }
                 .frame(width: 44)
                 .overlay(alignment: .topTrailing) {
                     if !model.cmux.sessions.isEmpty {
                         Text(model.cmux.sessions.count > 9 ? "9+" : "\(model.cmux.sessions.count)")
-                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(.black)
                             .frame(minWidth: 15, minHeight: 15)
                             .background(BrimletTheme.mint, in: Circle())
@@ -79,20 +75,20 @@ struct IslandView: View {
                     if model.currentModule == .timer {
                         if model.timer.countdown.phase == .running || model.timer.countdown.phase == .paused {
                             Text(Countdown.formatted(model.timer.countdown.remaining(at: model.timer.now)))
-                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                                .foregroundStyle(BrimletTheme.mint)
+                                .font(.system(size: 12, weight: .semibold)).monospacedDigit()
+                                .foregroundStyle(model.timer.countdown.phase == .running ? BrimletTheme.mint : BrimletTheme.secondary)
                         } else {
                             Image(systemName: model.timer.countdown.phase == .finished ? "checkmark" : "timer")
                                 .font(.system(size: 15, weight: .medium))
-                                .foregroundStyle(BrimletTheme.mint)
+                                .foregroundStyle(BrimletTheme.secondary)
                         }
                     } else if model.currentModule == .calendar {
                         Text(model.calendar.compactText)
-                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(BrimletTheme.mint)
+                            .font(.system(size: 12, weight: .semibold)).monospacedDigit()
+                            .foregroundStyle(BrimletTheme.primary)
                             .accessibilityLabel(model.calendar.next?.status(at: model.calendar.now) ?? String(localized: "No upcoming events"))
                     } else {
-                        Equalizer(active: model.music.track?.isPlaying == true && !reduceMotion && model.isPresented)
+                        Equalizer(active: model.music.track?.isPlaying == true, animate: !reduceMotion && model.isPresented)
                     }
                 }.frame(width: 44)
             }
@@ -108,17 +104,16 @@ struct IslandView: View {
     private var expandedBody: some View {
         VStack(spacing: 0) {
             HStack(spacing: 6) {
-                // Longer module names, as in Turkish, first drop the wordmark, then the titles of the other tabs.
+                // Narrow layouts keep the selected title and show symbols for the other tabs.
                 ViewThatFits(in: .horizontal) {
-                    tabBar(titles: true, wordmark: true)
-                    tabBar(titles: true, wordmark: false)
-                    tabBar(titles: false, wordmark: false)
+                    tabBar(titles: true)
+                    tabBar(titles: false)
                 }
                 IconButton(symbol: "gearshape", help: "Settings") { model.onOpenSettings?() }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 9)
-            .padding(.bottom, 14)
+            .padding(.horizontal, 16)
+            .padding(.top, 6)
+            .padding(.bottom, 10)
 
             if model.isShowingCmuxQueue {
                 cmuxQueue
@@ -130,6 +125,7 @@ struct IslandView: View {
                 case .todos: TodoCard(module: model.todos)
                 case nil:
                     EmptyCard(symbol: "square.stack.3d.up", title: "This space is yours", subtitle: "Start by turning on a module in Settings.", actionTitle: "Choose Modules") {
+                        model.settingsTab = .modules
                         model.onOpenSettings?()
                     }
                 }
@@ -139,42 +135,43 @@ struct IslandView: View {
         .frame(height: model.height - model.geometry.headerHeight)
     }
 
-    private func tabBar(titles: Bool, wordmark: Bool) -> some View {
+    private func tabBar(titles: Bool) -> some View {
         HStack(spacing: 6) {
             ForEach(model.modules) { module in
                 let selected = model.currentModule == module
                 Button { model.select(module) } label: {
                     HStack(spacing: 6) {
-                        Image(systemName: module.symbol).font(.system(size: 10, weight: .semibold))
+                        Image(systemName: module.symbol).font(.system(size: 13, weight: .medium))
                         if titles || selected {
-                            Text(module.title).font(.system(size: 11, weight: .semibold)).lineLimit(1).fixedSize()
+                            Text(module.title).font(.system(size: 12, weight: .medium)).lineLimit(1).fixedSize()
                         }
                         if module == .timer && model.timer.countdown.phase == .running {
                             Circle().fill(BrimletTheme.mint).frame(width: 4, height: 4)
                         }
                     }
                     .foregroundStyle(selected ? Color.white : BrimletTheme.secondary)
-                    .padding(.horizontal, 11).padding(.vertical, 7)
-                    .background(selected ? BrimletTheme.surface : Color.clear, in: Capsule())
+                    .padding(.horizontal, 10).frame(height: 28)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(IslandSelectionStyle(selected: selected))
                 .help(module.title)
                 .accessibilityLabel(module.title)
                 .accessibilityAddTraits(selected ? .isSelected : [])
+                .onMoveCommand { direction in
+                    guard let index = model.modules.firstIndex(of: module) else { return }
+                    let offset = direction == .left ? -1 : direction == .right ? 1 : 0
+                    if offset != 0 { model.select(model.modules[(index + offset + model.modules.count) % model.modules.count]) }
+                }
             }
             Spacer(minLength: 0)
             if !model.cmux.sessions.isEmpty {
                 Button { model.isShowingCmuxQueue.toggle() } label: {
                     Label("\(model.cmux.sessions.count)", systemImage: "bubble.left.and.bubble.right.fill")
-                        .font(.system(size: 10, weight: .semibold)).foregroundStyle(BrimletTheme.mint)
+                        .font(.system(size: 11, weight: .semibold)).foregroundStyle(BrimletTheme.mint)
                         .padding(.horizontal, 9).padding(.vertical, 6)
                         .background(BrimletTheme.mint.opacity(0.1), in: Capsule())
                 }.buttonStyle(.plain).help("cmux sessions waiting for you")
             }
-            if wordmark {
-                Text(verbatim: "BRIMLET").font(.system(size: 9, weight: .bold, design: .rounded)).tracking(2.2)
-                    .foregroundStyle(Color.white.opacity(0.23)).accessibilityHidden(true)
-            }
+
         }
     }
 
@@ -193,7 +190,7 @@ struct IslandView: View {
             HStack {
                 Text("Sessions waiting for you").font(.system(size: 12, weight: .semibold))
                 Spacer()
-                Text("Live · every 5 s").font(.system(size: 9)).foregroundStyle(BrimletTheme.secondary)
+                Text("Live · every 5 s").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
             }
             if model.cmux.sessions.isEmpty {
                 Text("No session is waiting for you.").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary).padding(.top, 24)
@@ -203,13 +200,13 @@ struct IslandView: View {
                         ForEach(model.cmux.sessions) { session in
                             Button { model.cmux.open(session) } label: {
                                 HStack(spacing: 10) {
-                                    Image(systemName: "terminal.fill").foregroundStyle(BrimletTheme.mint).frame(width: 18)
+                                    Image(systemName: "terminal.fill").foregroundStyle(BrimletTheme.secondary).frame(width: 18)
                                     VStack(alignment: .leading, spacing: 3) {
                                         Text(session.title).font(.system(size: 11, weight: .medium)).lineLimit(1)
-                                        Text("\(session.agent) · Waiting for your reply").font(.system(size: 9)).foregroundStyle(BrimletTheme.secondary).lineLimit(1)
+                                        Text("\(session.agent) · Waiting for your reply").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary).lineLimit(1)
                                     }
                                     Spacer()
-                                    Image(systemName: "arrow.up.right").font(.system(size: 9)).foregroundStyle(BrimletTheme.secondary)
+                                    Image(systemName: "arrow.up.right").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
                                 }.padding(.horizontal, 10).padding(.vertical, 7).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 9))
                             }.buttonStyle(.plain).help("Open this session in cmux")
                         }
@@ -226,14 +223,14 @@ struct IslandView: View {
                 Image(systemName: "bubble.left.and.bubble.right.fill").font(.system(size: 22)).foregroundStyle(BrimletTheme.mint)
                 VStack(alignment: .leading, spacing: 4) {
                     Text("\(session.title) is waiting").font(.system(size: 12, weight: .semibold)).lineLimit(1)
-                    Text("\(session.agent) · Open in cmux").font(.system(size: 10)).foregroundStyle(BrimletTheme.secondary).lineLimit(1)
+                    Text("\(session.agent) · Open in cmux").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary).lineLimit(1)
                 }
                 Spacer(minLength: 0)
                 if model.cmux.sessions.count > 1 {
-                    Text("+\(model.cmux.sessions.count - 1)").font(.system(size: 10, weight: .semibold)).foregroundStyle(BrimletTheme.mint)
+                    Text("+\(model.cmux.sessions.count - 1)").font(.system(size: 11, weight: .semibold)).foregroundStyle(BrimletTheme.mint)
                 }
-                Image(systemName: "arrow.up.right").font(.system(size: 10)).foregroundStyle(BrimletTheme.secondary)
-            }.padding(.horizontal, 22).frame(height: 66).contentShape(Rectangle())
+                Image(systemName: "arrow.up.right").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
+            }.padding(.horizontal, 20).frame(height: 66).contentShape(Rectangle())
         }.buttonStyle(.plain).help("Open this session in cmux")
     }
 
@@ -244,7 +241,8 @@ struct IslandView: View {
                     if model.currentModule == .music {
                         AlbumArt(image: model.music.artwork, size: 40, demo: model.demo)
                     } else {
-                        Image(systemName: model.currentModule == .calendar ? "calendar.badge.clock" : "checkmark.circle.fill").font(.system(size: 30)).foregroundStyle(BrimletTheme.mint)
+                        Image(systemName: model.currentModule == .calendar ? "calendar.badge.clock" : "checkmark.circle.fill").font(.system(size: 20)).foregroundStyle(BrimletTheme.primary)
+                            .frame(width: 40, height: 40).background(BrimletTheme.raised, in: RoundedRectangle(cornerRadius: 10))
                     }
                     VStack(alignment: .leading, spacing: 4) {
                         Text(model.activity?.title ?? "Brimlet").font(.system(size: 13, weight: .semibold)).lineLimit(1)
@@ -280,19 +278,20 @@ struct IslandView: View {
                 .opacity(model.music.commandPending ? 0.45 : 1)
             }
         }
-        .padding(.horizontal, 22).frame(height: 66)
+        .padding(.horizontal, 20).frame(height: 66)
     }
 
     private func externalPeek(_ notification: ExternalNotification) -> some View {
         HStack(spacing: 12) {
-            Image(systemName: notification.symbol).font(.system(size: 25, weight: .medium)).foregroundStyle(BrimletTheme.mint)
+            Image(systemName: notification.symbol).font(.system(size: 20, weight: .medium)).foregroundStyle(BrimletTheme.primary)
+                .frame(width: 40, height: 40).background(BrimletTheme.raised, in: RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 4) {
                 Text(notification.title).font(.system(size: 13, weight: .semibold)).lineLimit(1)
                 Text(notification.body).font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary).lineLimit(2)
             }
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 22).frame(height: 66)
+        .padding(.horizontal, 20).frame(height: 66)
         .accessibilityElement(children: .combine)
         .onTapGesture { model.dismissExternalNotification() }
         .accessibilityAction(named: "Dismiss Notification") { model.dismissExternalNotification() }
@@ -303,9 +302,9 @@ struct IslandView: View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.system(size: prominent ? 12 : 11, weight: .semibold))
-                .foregroundStyle(prominent ? Color.black : Color.white.opacity(0.85))
-                .frame(width: prominent ? 30 : 26, height: 30)
-                .background(prominent ? Color.white : Color.clear, in: Circle())
+                .foregroundStyle(prominent ? BrimletTheme.ink : BrimletTheme.primary)
+                .frame(width: prominent ? 30 : 28, height: 30)
+                .background(prominent ? BrimletTheme.mint : Color.clear, in: Circle())
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -321,15 +320,17 @@ private extension Shape {
 struct IconButton: View {
     let symbol: String
     let help: LocalizedStringKey
-    var size: CGFloat = 12
+    var size: CGFloat = 15
+    var prominent = false
     let action: () -> Void
     var body: some View {
         Button(action: action) {
             Image(systemName: symbol).font(.system(size: size, weight: .medium))
-                .foregroundStyle(Color.white.opacity(0.55)).frame(width: 26, height: 26)
+                .foregroundStyle(prominent ? BrimletTheme.ink : BrimletTheme.secondary).frame(width: 28, height: 28)
+                .background(prominent ? BrimletTheme.mint : .clear, in: RoundedRectangle(cornerRadius: 8))
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain).help(help).accessibilityLabel(help)
+        .buttonStyle(IslandSelectionStyle()).help(help).accessibilityLabel(help)
     }
 }
 
@@ -362,13 +363,14 @@ struct AlbumArt: View {
 
 struct Equalizer: View {
     let active: Bool
+    var animate = true
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 12, paused: !active)) { context in
+        TimelineView(.animation(minimumInterval: 1.0 / 12, paused: !active || !animate)) { context in
             HStack(alignment: .center, spacing: 2.5) {
                 ForEach(0..<5) { index in
                     let phase = context.date.timeIntervalSinceReferenceDate * 4 + Double(index) * 1.4
-                    let height = active ? 5 + (sin(phase) + 1) * 6 : 4
-                    Capsule().fill(BrimletTheme.mint).frame(width: 2.5, height: height)
+                    let height = active ? (animate ? 5 + (sin(phase) + 1) * 6 : Double([7, 14, 9, 16, 11][index])) : 4
+                    Capsule().fill(active ? BrimletTheme.mint : BrimletTheme.secondary).frame(width: 2.5, height: height)
                 }
             }.frame(width: 24, height: 20)
         }
@@ -384,21 +386,13 @@ struct EmptyCard: View {
     let action: () -> Void
     var body: some View {
         VStack(spacing: 10) {
-            Image(systemName: symbol).font(.system(size: 26, weight: .light)).foregroundStyle(BrimletTheme.mint)
+            Image(systemName: symbol).font(.system(size: 22, weight: .medium)).foregroundStyle(BrimletTheme.secondary)
             VStack(spacing: 5) {
-                Text(title).font(.system(size: 15, weight: .semibold))
+                Text(title).font(.system(size: 13, weight: .semibold))
                 Text(subtitle).font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary).multilineTextAlignment(.center)
             }
             Button(actionTitle, action: action).buttonStyle(MintButtonStyle()).padding(.top, 2)
         }
-        .frame(maxWidth: .infinity).frame(height: 158).padding(.horizontal, 24)
-    }
-}
-
-struct MintButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label.font(.system(size: 11, weight: .semibold))
-            .foregroundStyle(Color.black).padding(.horizontal, 16).padding(.vertical, 9)
-            .background(BrimletTheme.mint.opacity(configuration.isPressed ? 0.7 : 1), in: Capsule())
+        .frame(maxWidth: .infinity).frame(height: 158).padding(.horizontal, 20)
     }
 }

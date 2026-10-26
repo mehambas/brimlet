@@ -4,6 +4,7 @@ public struct CalendarEvent: Equatable, Identifiable, Sendable {
     public let id: String
     public let title: String
     public let calendarTitle: String
+    public let calendarColorRGB: UInt32?
     public let start: Date
     public let end: Date
     public let isAllDay: Bool
@@ -14,10 +15,11 @@ public struct CalendarEvent: Equatable, Identifiable, Sendable {
 
     public init(id: String, title: String, calendarTitle: String, start: Date, end: Date,
                 isAllDay: Bool = false, meetingURL: URL? = nil, calendarID: String = "",
-                itemIdentifier: String = "", occurrenceDate: Date? = nil) {
+                itemIdentifier: String = "", occurrenceDate: Date? = nil, calendarColorRGB: UInt32? = nil) {
         self.id = id
         self.title = title
         self.calendarTitle = calendarTitle
+        self.calendarColorRGB = calendarColorRGB
         self.start = start
         self.end = end
         self.isAllDay = isAllDay

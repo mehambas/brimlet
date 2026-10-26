@@ -14,12 +14,9 @@ struct MusicCard: View {
                 HStack(spacing: 14) {
                     AlbumArt(image: module.artwork, size: 64, demo: demo)
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(track.title).font(.system(size: 16, weight: .semibold)).lineLimit(1)
+                        Text(track.title).font(.system(size: 15, weight: .semibold)).lineLimit(1)
                         Text(track.artist).font(.system(size: 12)).foregroundStyle(BrimletTheme.secondary).lineLimit(1)
-                        HStack(spacing: 4) {
-                            Circle().fill(BrimletTheme.mint).frame(width: 4, height: 4)
-                            Text(verbatim: "SPOTIFY").font(.system(size: 8, weight: .semibold)).tracking(1.5)
-                        }.foregroundStyle(BrimletTheme.mint.opacity(0.85))
+                        Text(verbatim: "Spotify").font(.system(size: 11)).foregroundStyle(BrimletTheme.tertiary)
                     }
                     Spacer(minLength: 0)
                     IconButton(symbol: "arrow.up.right", help: "Open in Spotify") { module.openSpotify() }
@@ -37,38 +34,42 @@ struct MusicCard: View {
                             Spacer()
                             Text("−" + Countdown.formatted(track.duration - (seekValue ?? track.elapsed(at: context.date))))
                         }
-                        .font(.system(size: 9, weight: .medium, design: .monospaced))
+                        .font(.system(size: 11, weight: .medium)).monospacedDigit()
                         .foregroundStyle(BrimletTheme.secondary)
                     }
                 }
-                HStack(spacing: 28) {
+                HStack(spacing: 22) {
                     playbackButton("backward.fill", label: "Previous Track", size: 17) { module.send(.previous) }
                     Button { module.send(.playPause) } label: {
                         Image(systemName: track.isPlaying ? "pause.fill" : "play.fill")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundStyle(Color.black).frame(width: 40, height: 40)
-                            .background(Color.white, in: Circle())
+                            .foregroundStyle(BrimletTheme.ink).frame(width: 40, height: 40)
+                            .background(BrimletTheme.mint, in: Circle())
+                            .overlay(Circle().strokeBorder(Color.white.opacity(0.35), lineWidth: 1).mask(LinearGradient(colors: [.white, .clear], startPoint: .top, endPoint: .center)))
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(track.isPlaying ? "Pause" : "Play")
+                    .help(track.isPlaying ? "Pause" : "Play")
                     playbackButton("forward.fill", label: "Next Track", size: 17) { module.send(.next) }
                     Button { module.toggleLyrics() } label: {
                         Image(systemName: "quote.bubble")
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(module.lyricsVisible ? BrimletTheme.mint : Color.white.opacity(0.75))
-                            .frame(width: 30, height: 30)
+                            .frame(width: 28, height: 28)
+                            .background(module.lyricsVisible ? Color(hex: 0x0D2019) : .clear, in: RoundedRectangle(cornerRadius: 8))
                     }
                     .buttonStyle(.plain)
                     .help(module.lyricsVisible ? "Hide Lyrics" : "Show Lyrics")
                     .accessibilityLabel(module.lyricsVisible ? "Hide Lyrics" : "Show Lyrics")
                 }
                 .frame(maxWidth: .infinity)
+                .disabled(module.commandPending)
                 if module.lyricsVisible {
                     LyricsPanel(module: module, track: track)
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 20)
             .onChange(of: track.id) { _, _ in seekValue = nil }
         } else {
             connectionCard
@@ -95,7 +96,7 @@ struct MusicCard: View {
                     }
                 }
                 Button("I’ve allowed it, try again") { module.retry() }
-                    .font(.system(size: 10)).foregroundStyle(BrimletTheme.secondary).buttonStyle(.plain)
+                    .font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary).buttonStyle(.plain)
             }
         case .failed(let message):
             EmptyCard(symbol: "arrow.clockwise", title: "Let’s reconnect.", subtitle: "\(message)",
@@ -118,14 +119,15 @@ private struct LyricsPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack {
-                Label("Lyrics", systemImage: "quote.bubble.fill")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(BrimletTheme.mint)
-                Spacer()
-                Text(module.lyrics?.isSynced == true ? "SYNCED" : "LYRICS")
-                    .font(.system(size: 8, weight: .bold, design: .rounded))
-                    .tracking(1.2)
+                Text("Lyrics")
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(BrimletTheme.secondary)
+                Spacer()
+                Text(module.lyrics?.isSynced == true ? "Synced" : "Plain")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(BrimletTheme.secondary)
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(BrimletTheme.raised, in: RoundedRectangle(cornerRadius: 5))
             }
             if module.lyricsLoading {
                 HStack(spacing: 8) {
@@ -159,6 +161,7 @@ private struct LyricsPanel: View {
         }
         .padding(12)
         .background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
     }
 }
 
@@ -175,8 +178,8 @@ private struct SeekBar: View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule().fill(Color.white.opacity(0.13)).frame(height: 3)
-                Capsule().fill(BrimletTheme.mint).frame(width: max(0, proxy.size.width * fraction), height: 3)
-                Circle().fill(BrimletTheme.mint).frame(width: hovered ? 9 : 6, height: hovered ? 9 : 6)
+                Capsule().fill(BrimletTheme.primary).frame(width: max(0, proxy.size.width * fraction), height: 3)
+                Circle().fill(BrimletTheme.primary).frame(width: hovered ? 9 : 6, height: hovered ? 9 : 6)
                     .offset(x: max(0, min(proxy.size.width - 6, proxy.size.width * fraction - 3)))
             }
             .frame(height: 14)
@@ -193,6 +196,12 @@ private struct SeekBar: View {
             .onHover { hovered = $0 }
         }
         .frame(height: 14)
+        .focusable(enabled)
+        .onMoveCommand { direction in
+            guard enabled else { return }
+            if direction == .left { onCommit(max(0, value - 5)) }
+            if direction == .right { onCommit(min(duration, value + 5)) }
+        }
         .accessibilityElement()
         .accessibilityLabel("Track position")
         .accessibilityValue(Countdown.formatted(value) + " / " + Countdown.formatted(duration))

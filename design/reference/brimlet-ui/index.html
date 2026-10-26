@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brimlet · UI-Redesign – Übersicht</title>
+<link rel="icon" href="assets/brimlet-32.png">
+<link rel="stylesheet" href="brimlet.css">
+<link rel="stylesheet" href="board.css">
+<style>
+.hero { display: grid; gap: 40px; align-items: center; }
+@media (min-width: 1180px) { .hero { grid-template-columns: minmax(0, 1fr) auto; } }
+.hero-art { display: grid; gap: 12px; justify-items: center; }
+.diag { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); margin-top: 20px; }
+.diag .b-card { display: grid; gap: 12px; align-content: start; }
+.diag img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--b-line); }
+.diag .crop { overflow: hidden; border-radius: 10px; box-shadow: 0 0 0 1px var(--b-line); }
+.diag .crop img { box-shadow: none; border-radius: 0; }
+.mat { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); margin-top: 20px; }
+.mat .b-card { display: grid; gap: 10px; align-content: start; }
+.mat i { display: block; height: 56px; border-radius: 10px; }
+.pages { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); margin-top: 20px; }
+.pages a { display: grid; gap: 6px; padding: 18px 20px; border-radius: 14px; background: var(--b-card); box-shadow: 0 0 0 1px var(--b-line); color: var(--b-ink); text-decoration: none; }
+.pages a b { font: 600 17px/22px var(--font-text); }
+.pages a span { font: 400 14px/21px var(--font-text); color: var(--b-ink-2); }
+@media (hover: hover) { .pages a:hover { background: var(--b-fill); } }
+.before-stage { display: grid; place-items: start center; padding: 40px; border-radius: 12px; background: #25292c; overflow-x: auto; }
+.keep { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); margin-top: 20px; }
+</style>
+</head>
+<body>
+<header class="b-top"><div class="b-top-in"><a class="b-brand" href="index.html"><img src="assets/brimlet-256.png" alt="" width="26" height="26">Brimlet <span>UI-Redesign</span></a>
+<nav class="b-pages" aria-label="Seiten"><a href="index.html" aria-current="page">Übersicht</a><a href="insel.html">Insel</a><a href="einstellungen.html">Einstellungen</a><a href="system.html">Designsystem</a><a href="zuordnung.html">Zuordnung</a></nav></div></header>
+
+<main class="board" data-od-id="overview-board">
+  <div class="hero">
+    <div>
+      <p class="b-eyebrow">Designvorschlag · 26.10.2026 · nur Gestaltung, kein Swift-Code geändert</p>
+      <h1 class="b-h1">Brimlet: ruhiger, klarer, mehr Mac</h1>
+      <p class="b-lead">Die Insel wird zum Graphit-Balken des Logos, Mint zum Glastropfen: eine Farbe für das, was läuft, und für die eine Hauptaktion. Die Einstellungen werden ein gewöhnliches, gutes Mac-Fenster nach Findlings Vorbild. Alle Funktionen und Verhaltensweisen bleiben.</p>
+      <div class="b-specs">
+        <div class="b-spec"><b>1 Richtung</b><span>Graphit und Glas</span></div>
+        <div class="b-spec"><b>0 Funktionen</b><span>entfernt</span></div>
+        <div class="b-spec"><b>11 pt</b><span>kleinster Text, statt 8 pt</span></div>
+        <div class="b-spec"><b>520 pt</b><span>Einstellungen, statt 700</span></div>
+        <div class="b-spec"><b>EN · TR</b><span>geprüft</span></div>
+      </div>
+    </div>
+    <div class="hero-art" id="hero" data-od-id="hero-art"></div>
+  </div>
+
+  <section class="b-section" id="diagnose" aria-labelledby="d-h"><h2 class="b-title" id="d-h"><span class="b-num">1</span>Diagnose</h2>
+    <p class="b-note">Grundlage sind die gespeicherten Vorschauen in <code>dist/previews</code> und die Quellen in <code>Sources/Brimlet</code>. Wo die Vorschau und der Code auseinandergehen, gilt der Code.</p>
+    <div class="diag">
+      <article class="b-card"><img src="assets/before/settings-modules.png" alt="Heutige Einstellungen, Seite Modules: dunkles Fenster mit Seitenleiste, große Überschrift „What should live up here?“, vier große Modulkarten." width="1400" height="1100" loading="lazy"><p class="b-card-t">Ein Einstellungsfenster, das nicht nach Mac aussieht</p><p>700 × 550 pt fest, 205-pt-Seitenleiste, immer dunkel. Überschriften wie „What should live up here?“ in 24 pt gerundeter Schrift sprechen wie eine Website. Modulkarten mit 38 × 42-pt-Kacheln nehmen viel Raum für wenig Inhalt.</p></article>
+      <article class="b-card"><p class="b-card-t">Die Seite „Modules“ macht sechs Dinge</p><p>Module und Reihenfolge, drei Verhaltensschalter, Spotify-Verbindung, Kalender (nur wenn eingeschaltet, mitten in der Seite), fremde Apps, cmux und drei Fußnoten – alles in einer langen Scrollfläche. Wer den Kalender einrichten will, sucht ihn zwischen Spotify und fremden Apps.</p><div class="crop"><img src="assets/before/settings-general.png" alt="Heutige Einstellungen, Seite General: Karten für Open at Login, Updates und Privacy." width="1400" height="1100" loading="lazy"></div></article>
+      <article class="b-card"><img src="assets/before/lyrics.png" alt="Heutige Insel mit Songtext: Etikett SYNCED in kleinen Versalien, Zeitangaben in 9 pt Monospace." width="1024" height="1036" loading="lazy"><p class="b-card-t">Zu kleine, zu blasse Texte</p><p>51 Stellen im Code setzen 8–10 pt, die meisten für Text: „SPOTIFY“ und „SYNCED“ in 8 pt Versalien, Zeiten 9 pt Monospace, Aufgaben-Meta 9 pt, Filterchips 9 pt, „Version 0.1.0“ 9 pt in Tertiärgrau, Hilfetexte 10 pt in Sekundärgrau.</p></article>
+      <article class="b-card"><img src="assets/before/calendar.png" alt="Heutige Kalenderansicht: Mint-Symbol, Mint-Countdown, Mint-Taste Join, Mint-Statustexte." width="1024" height="708" loading="lazy"><p class="b-card-t">Mint überall heißt Mint nirgends</p><p>Im Kalender stehen Symbol, Countdown, „in 8 min“, „in 2 h“ und „Join“ gleichzeitig in Mint. Ebenso Navigation, Modulsymbole, Zeitleiste, Ring, Links, Etiketten und der Rand der Zitatkarte. Es bleibt kein Signal für das Wichtige.</p></article>
+      <article class="b-card"><img src="assets/before/quote-capture.png" alt="Heutige Zitaterfassung: dunkle Karte mit Mint-Rand, Mint-Etikett und Mint-Kapseltaste." width="928" height="810" loading="lazy"><p class="b-card-t">Vier Oberflächen, vier Dialekte</p><p>Insel schwarz, Einstellungen #131616, Aufgabenblatt #131616 mit gerundetem 18-pt-Titel, Zitatkarte #111614 mit Mint-Rand. Radien 9, 10, 12, 13, 22, 24; drei Tastenarten (Mint-Kapsel, weißer Kreis, schlichte Textknöpfe).</p></article>
+      <article class="b-card"><img src="assets/brimlet-256.png" alt="Brimlet-Logo: grauer Balken mit Mint-Tropfen auf heller Platte." width="256" height="256" style="width:120px;height:120px;box-shadow:none" loading="lazy"><p class="b-card-t">Das Logo hat Material, die Oberfläche nicht</p><p>Das Logo zeigt matten Graphit, Glas mit Licht und eine kühle Platte. Die Oberfläche nutzt davon nur ein flaches Pastell-Mint (#8CE8C4). Graphit, Glas und Platte fehlen.</p></article>
+    </div></section>
+
+  <section class="b-section" id="richtung" aria-labelledby="r-h"><h2 class="b-title" id="r-h"><span class="b-num">2</span>Richtung: Graphit und Glas</h2>
+    <p class="b-note">Eine Richtung, aus dem Logo abgeleitet. Jedes Material bekommt eine Aufgabe; keines wird als 3D-Effekt auf Tasten kopiert.</p>
+    <div class="mat">
+      <div class="b-card"><i style="background:linear-gradient(#6A7482,#232930)"></i><p class="b-card-t">Graphit trägt</p><p>Die Insel ist der Balken: schwarz an der Notch, Flächen darin in Graphit #111418 und #23282F aus dem Logo statt weißem Alpha. Dazu eine feine Lichtkante an Seiten und Unterkante.</p></div>
+      <div class="b-card"><i style="background:radial-gradient(circle at 40% 35%,#9CF4CE,#60E7B4 35%,#25D39B 70%,#0D976D)"></i><p class="b-card-t">Glas hebt hervor</p><p>Mint #60E7B4 nur für Laufendes und die eine Hauptaktion, mit einer Lichtkante oben. Die runde Wiedergabe-Taste ist der Tropfen aus dem Logo. In Systemfenstern wird daraus Jade #227F5F / #1EA87B, damit es auf Weiß lesbar bleibt.</p></div>
+      <div class="b-card"><i style="background:linear-gradient(#F6F9FC,#EDF2F8);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)"></i><p class="b-card-t">Die Platte beruhigt</p><p>Die Zitatkarte trägt im Hellen die kühle Platte des Logos, im Dunkeln Graphit. Die Einstellungen bleiben bei den neutralen Systemfarben: Brimlet ist dort Gast in macOS, wie Findling.</p></div>
+    </div>
+    <h3 class="b-sub">Was Findling beisteuert</h3>
+    <ul class="b-points"><li>Native Toolbar-Tabs, gruppierte Form, Standardsteuerungen, 520 pt Breite.</li><li>13 pt Text, 11 pt Hilfetext, linksbündige Fußzeilen, keine Werbesprache in Überschriften.</li><li>Erscheinungsbild folgt dem System; Akzent nur auf Auswahl, Schaltern und einer Hauptaktion.</li><li>Zustände (leer, lädt, Warnung) in der Zeile, in der sie entstehen, statt als Textblock.</li></ul></section>
+
+  <section class="b-section" id="bleibt" aria-labelledby="k-h"><h2 class="b-title" id="k-h"><span class="b-num">3</span>Was bleibt, was sich ändert</h2>
+    <div class="keep">
+      <div class="b-card"><p class="b-card-t">Bleibt</p><ul class="b-points"><li>Alle Funktionen und Texte, Englisch und Türkisch.</li><li>Geometrie: Notch + 108, Kapsel 218 × 36 und 8 pt Abstand, 432 pt Breite, Kopf + 236, Peek + 66, Songtexte + 164.</li><li>Verhalten: Zeigen 180 ms, Verlassen 0,6 s, Klick daneben, Esc, feste Oberkante, Modulreihenfolge und Prioritäten, Peek-Dauern.</li><li>Insel schwarz in beiden Erscheinungsbildern; nichts hinter der Kamera.</li><li>Architektur: NSPanel, AppModel, Module, NSMenu.</li></ul></div>
+      <div class="b-card"><p class="b-card-t">Ändert sich</p><ul class="b-points"><li>Einstellungen: fünf Toolbar-Tabs, 520 pt, Hell/Dunkel, gruppierte Form.</li><li>Mint nur für Laufendes und eine Hauptaktion; Information weiß, Nebensache grau.</li><li>Kleinster Text 11 pt, keine Versalien, keine gerundete Schrift.</li><li>Ein Radiussystem (24/12/10/8), zwei Tastenarten, ein Muster für leere Zustände.</li><li>Aufgabenblatt und Zitatkarte folgen dem System.</li><li>Neu, nur Anzeige: Kalenderfarbe, Name und Symbol erlaubter Apps, wenige Hilfetexte.</li></ul></div>
+    </div></section>
+
+  <section class="b-section" id="seiten" aria-labelledby="s-h"><h2 class="b-title" id="s-h"><span class="b-num">4</span>Die Teile des Boards</h2>
+    <div class="pages">
+      <a href="insel.html"><b>Insel</b><span>Bedienbarer Prototyp mit echten pt-Maßen und Prototyp-Steuerung; alle Zustände von Kompakt bis Zitatkarte.</span></a>
+      <a href="einstellungen.html"><b>Einstellungen</b><span>Bedienbares Fenster, alle fünf Tabs hell und dunkel, Update-Ablauf, Berechtigungen, Fehler, Menü.</span></a>
+      <a href="system.html"><b>Designsystem</b><span>Farbe, Typografie, Abstände, Radien, Kanten, Symbole, Bewegung, Komponenten mit Zuständen, SwiftUI-Zuordnung.</span></a>
+      <a href="zuordnung.html"><b>Zuordnung</b><span>Jede Funktion mit altem und neuem Ort, Maße und kleine Bildschirme, gemessener Türkisch-Längentest.</span></a>
+    </div></section>
+
+  <section class="b-section" id="vorher-nachher" aria-labelledby="v-h"><h2 class="b-title" id="v-h"><span class="b-num">5</span>Vorher und nachher</h2>
+    <p class="b-note">Beide Seiten im gleichen Maßstab (1 CSS-px = 1 pt). Links die gespeicherten Vorschauen, rechts der neue Entwurf mit denselben Beispielinhalten.</p>
+    <div id="ba"></div></section>
+
+  <p class="b-foot">Die Vorher-Bilder sind Brimlets eigene Vorschauen (<code>--capture-previews</code>). Beispielinhalte stammen aus Brimlets Vorschaumodus. Die Gestaltung ist ein Vorschlag; am Swift-Code wurde nichts geändert.</p>
+</main>
+
+<script src="ui.js"></script>
+<script>
+(() => {
+'use strict';
+const B = window.BUI;
+const base = { lang: 'en', notch: true, music: { conn: 'playing', elapsed: 92 }, timer: { phase: 'running', sel: 25, remaining: 1500, total: 1500 }, cal: { access: 'ready', range: 'today' }, noAnim: true };
+document.getElementById('hero').innerHTML = `<div inert>${B.desk({ ...base, mode: 'expanded', module: 'music', music: { conn: 'playing', elapsed: 92, lyrics: 'synced', line: 1 } }, { width: 560, dark: true })}</div>`;
+const after = (s) => `<div class="before-stage" inert>${B.island({ ...base, ...s })}</div>`;
+const win = (s, dark) => `<div class="before-stage" style="background:#7d8796 url('assets/wallpaper-sonoma-${dark ? 'dark' : 'light'}.jpg') center/cover" inert>${B.settings({ lang: 'en', theme: dark ? 'dark' : 'light', update: { state: 'idle', lastCheck: '26 Oct 2026 at 09:12', current: '0.2.0' }, login: { on: true }, mods: { order: ['music', 'timer', 'calendar', 'todos'], on: { music: true, timer: true, calendar: false, todos: true } }, spotify: 'none', ...s })}</div>`;
+const pairs = [
+  ['Einstellungen · Module', 'settings-modules.png', 1400, 1100, win({ tab: 'modules' }), 'Fünf Gruppen statt einer Scrollfläche; Kalender, fremde Apps und cmux haben eigene Tabs.'],
+  ['Einstellungen · Allgemein', 'settings-general.png', 1400, 1100, win({ tab: 'general' }, true), 'App, Version und Updates oben, „Erscheinungsbild“ eingeordnet, Datenschutz als Fußzeile.'],
+  ['Musik', 'music.png', 1024, 708, after({ mode: 'expanded', module: 'music' }), 'Mint nur auf der Wiedergabe und dem laufenden Equalizer; Zeiten 11 pt; keine Wortmarke.'],
+  ['Kalender', 'calendar.png', 1024, 708, after({ mode: 'expanded', module: 'calendar' }), 'Zwei Zeilen je Termin mit Kalenderfarbe; nur das baldige „Beitreten“ in Mint.'],
+  ['Timer', 'timer.png', 1024, 708, after({ mode: 'expanded', module: 'timer', timer: { phase: 'running', remaining: 1500, total: 1500 } }), '„Pause“ neutral, der Ring zeigt den Fortschritt.'],
+  ['Peek', 'peek-playing.png', 1024, 368, after({ mode: 'peek', module: 'music', peek: { kind: 'music' } }), 'Klickflächen getrennt: links öffnen, rechts steuern.'],
+  ['Zitatkarte', 'quote.png', 928, 796, `<div class="before-stage" style="background:#7d8796 url('assets/wallpaper-sonoma-light.jpg') center/cover" inert>${B.quote({ lang: 'en', theme: 'light' })}</div>`, 'Folgt dem System; im Hellen die Platte des Logos, Quelle als Gedankenstrich-Zeile statt Mint-Strich.'],
+];
+document.getElementById('ba').innerHTML = pairs.map(([title, img, w, h, html, note]) => `<h3 class="b-sub">${title}</h3><p class="b-note">${note}</p><div class="ba"><div class="ba-side"><span class="ba-k">Vorher</span><img class="ba-img" src="assets/before/${img}" width="${w / 2}" height="${h / 2}" alt="Heutige Ansicht: ${title}" loading="lazy" style="max-width:${w / 2}px"></div><div class="ba-side"><span class="ba-k is-new">Nachher</span>${html}</div></div>`).join('');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "brimlet-ui/einstellungen.html",
+  "entry": "brimlet-ui/einstellungen.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-10-26T13:22:04.896Z",
+  "updatedAt": "2026-10-26T13:22:04.896Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

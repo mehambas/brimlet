@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "brimlet-ui/index.html",
+  "entry": "brimlet-ui/index.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-10-26T13:31:14.442Z",
+  "updatedAt": "2026-10-26T13:31:14.442Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

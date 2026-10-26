@@ -23,23 +23,29 @@ struct CalendarCard: View {
     private var agenda: some View {
         VStack(spacing: 7) {
             HStack(spacing: 8) {
-                Picker("Agenda", selection: $module.agendaRange) {
-                    ForEach(AgendaRange.allCases) { range in Text(range.title).tag(range) }
-                }.pickerStyle(.segmented).labelsHidden()
+                HStack(spacing: 2) {
+                    ForEach(AgendaRange.allCases) { range in
+                        Button { module.agendaRange = range } label: {
+                            Text(range.title).font(.system(size: 12, weight: .medium))
+                                .frame(maxWidth: .infinity).frame(height: 28)
+                        }.buttonStyle(IslandSelectionStyle(selected: module.agendaRange == range))
+                            .accessibilityAddTraits(module.agendaRange == range ? .isSelected : [])
+                    }
+                }.accessibilityLabel("Agenda")
                 IconButton(symbol: "arrow.clockwise", help: "Refresh Calendar") { module.refresh() }
                 IconButton(symbol: "calendar", help: "Open Calendar") { module.openCalendar() }
             }
             if let error = module.actionError {
-                Text(error).font(.system(size: 10)).foregroundStyle(.orange)
+                Text(error).font(.system(size: 11)).foregroundStyle(.orange)
             }
             if module.loading && module.events.isEmpty {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if module.agenda.isEmpty {
                 VStack(spacing: 8) {
-                    Image(systemName: "calendar.badge.checkmark").font(.system(size: 23)).foregroundStyle(BrimletTheme.mint)
+                    Image(systemName: "calendar.badge.checkmark").font(.system(size: 23)).foregroundStyle(BrimletTheme.secondary)
                     Text("No events in this range").font(.system(size: 13, weight: .medium))
                     Text("Choose which calendars to show in Settings.")
-                        .font(.system(size: 10)).foregroundStyle(BrimletTheme.secondary)
+                        .font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
@@ -48,7 +54,7 @@ struct CalendarCard: View {
                     }
                 }.id(module.agendaRange)
             }
-        }.padding(.horizontal, 22).frame(height: 174)
+        }.padding(.horizontal, 20).frame(height: 192)
     }
 
     private func eventRow(_ event: CalendarEvent) -> some View {
@@ -56,23 +62,30 @@ struct CalendarCard: View {
             Button { module.openEvent(event) } label: {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(event.title).font(.system(size: 12, weight: .semibold)).lineLimit(2)
-                    Text(schedule(event) + " · " + event.calendarTitle)
-                        .font(.system(size: 10)).foregroundStyle(BrimletTheme.secondary).lineLimit(1)
-                    Text(event.status(at: module.now)).font(.system(size: 10)).foregroundStyle(BrimletTheme.mint)
+                    HStack(spacing: 4) {
+                        Text(event.status(at: module.now))
+                            .foregroundStyle(event.start <= module.now && event.end > module.now ? BrimletTheme.mint : BrimletTheme.primary)
+                        Text("·")
+                        Text(schedule(event)).lineLimit(1)
+                        Text("·")
+                        if let color = event.calendarColorRGB { Circle().fill(Color(hex: color)).frame(width: 7, height: 7).accessibilityHidden(true) }
+                        Text(event.calendarTitle).lineLimit(1)
+                    }.font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
+
                 }.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
             }.buttonStyle(.plain).help("Show in Calendar")
             if event.meetingURL != nil && event.end > module.now {
-                Button("Join") { module.openMeeting(event) }.buttonStyle(MintButtonStyle())
+                Button("Join") { module.openMeeting(event) }.buttonStyle(MintButtonStyle(prominent: event.start.timeIntervalSince(module.now) <= 600))
                     .accessibilityLabel("Join \(event.title)")
             }
             IconButton(symbol: "arrow.up.right", help: "Show in Calendar") { module.openEvent(event) }
-        }.padding(10).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 10))
-            .opacity(event.end <= module.now ? 0.55 : 1)
+        }.padding(.horizontal, 10).padding(.vertical, 8).background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 10))
+            .foregroundStyle(event.end <= module.now ? BrimletTheme.tertiary : BrimletTheme.primary)
     }
 
     private func schedule(_ event: CalendarEvent) -> String {
-        let day = Calendar.current.isDateInToday(event.start) ? String(localized: "Today") : event.start.formatted(.dateTime.day().month())
-        if event.isAllDay { return "\(day) · " + String(localized: "All day") }
-        return "\(day) · \(event.start.formatted(date: .omitted, time: .shortened)) – \(event.end.formatted(date: .omitted, time: .shortened))"
+        let day = module.agendaRange == .week ? (Calendar.current.isDateInToday(event.start) ? String(localized: "Today") : event.start.formatted(.dateTime.day().month())) + " · " : ""
+        if event.isAllDay { return day + String(localized: "All day") }
+        return "\(day)\(event.start.formatted(date: .omitted, time: .shortened)) – \(event.end.formatted(date: .omitted, time: .shortened))"
     }
 }
