@@ -36,11 +36,16 @@ struct IslandView: View {
                 .mask(alignment: .bottom) { Rectangle().padding(.top, model.geometry.hasNotch ? 1 : 0) }
                 .allowsHitTesting(false)
         }
+        // AppKit animates the window's height independently of SwiftUI's target height.
+        // Keep that target-sized content at the top of the intermediate hosting bounds.
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
+        .clipped()
         .contentShape(IslandShape(hasNotch: model.geometry.hasNotch))
         .onHover { model.hover($0) }
         .foregroundStyle(BrimletTheme.primary)
         .environment(\.colorScheme, .dark)
         .preferredColorScheme(.dark)
+        .animation(reduceMotion ? nil : .easeInOut(duration: LyricsPresentation.resizeDuration), value: model.music.lyricsVisible)
         .animation(reduceMotion ? nil : .smooth(duration: 0.24), value: model.isExpanded)
         .animation(reduceMotion ? nil : .smooth(duration: 0.24), value: model.isPeeking)
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: model.currentModule)
@@ -109,7 +114,10 @@ struct IslandView: View {
                     tabBar(titles: true)
                     tabBar(titles: false)
                 }
-                IconButton(symbol: "gearshape", help: "Settings") { model.onOpenSettings?() }
+                SettingsUpdateButton(updater: model.updater) {
+                    if model.updater.release != nil { model.settingsTab = .general }
+                    model.onOpenSettings?()
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 6)
@@ -315,6 +323,31 @@ struct IslandView: View {
 
 private extension Shape {
     func strokeBorderCompatible(_ color: Color) -> some View { stroke(color, lineWidth: 1) }
+}
+
+/// Observe the updater directly so a background check updates the dot while the panel is open.
+private struct SettingsUpdateButton: View {
+    @ObservedObject var updater: Updater
+    let action: () -> Void
+
+    private var label: LocalizedStringKey {
+        updater.release == nil ? "Settings" : "Settings — Update available"
+    }
+
+    var body: some View {
+        IconButton(symbol: "gearshape", help: label, action: action)
+            .overlay(alignment: .topTrailing) {
+                if updater.release != nil {
+                    Circle()
+                        .fill(BrimletTheme.mint)
+                        .frame(width: 7, height: 7)
+                        .overlay { Circle().stroke(Color.black, lineWidth: 2) }
+                        .offset(x: -1, y: 1)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
+    }
 }
 
 struct IconButton: View {

@@ -129,7 +129,8 @@ private final class IslandHostingView: NSHostingView<IslandView> {
                            width: model.width, height: model.height)
         if animated && panel.isVisible && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
             NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.22
+                let verticalResize = model.isExpanded && abs(panel.frame.width - frame.width) < 1
+                context.duration = verticalResize ? LyricsPresentation.resizeDuration : 0.22
                 context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                 panel.animator().setFrame(frame, display: true)
             }

@@ -94,7 +94,7 @@ import BrimletIPC
     var height: Double {
         guard isExpanded else { return geometry.headerHeight + (isPeeking ? 66 : 0) }
         guard currentModule == .music else { return geometry.expandedHeight }
-        return geometry.expandedHeight + (music.lyricsVisible ? 164 : 0)
+        return geometry.expandedHeight + (music.lyricsVisible ? LyricsPresentation.extraHeight : 0)
     }
 
     func applyPreferences() {

@@ -67,6 +67,15 @@ final class MemoryDefaults: UserDefaults {
                 try save(IslandView(model: calendarModel).padding(40).background(background),
                          to: "\(directory)/calendar\(empty ? "-empty" : "").png")
             }
+            let updateModel = AppModel(demo: true)
+            updateModel.preparePreview()
+            updateModel.updater.release = Release(tag: "v99.0.0",
+                page: URL(string: "https://github.com/mehambas/brimlet/releases")!, assets: [:])
+            try save(IslandView(model: updateModel).padding(40).background(background),
+                     to: "\(directory)/update-available.png")
+            updateModel.updater.release = nil
+            try save(IslandView(model: updateModel).padding(40).background(background),
+                     to: "\(directory)/update-cleared.png")
             let lyricsModel = AppModel(demo: true)
             lyricsModel.preparePreview()
             lyricsModel.music.showLyricsPreview(SampleData.lyrics)
@@ -118,8 +127,73 @@ final class MemoryDefaults: UserDefaults {
                 try save(IslandView(model: peekModel).padding(40).background(background),
                          to: "\(directory)/peek-\(paused ? "paused" : "playing").png")
             }
+            try captureLyricsMotion(to: directory)
+            try captureLyricsLines(to: directory)
             print("Previews: \(directory)")
         } catch { fputs("Preview error: \(error)\n", stderr) }
+    }
+
+    /// Capture intermediate hosting sizes, where centered content used to shift during resizing.
+    static func captureLyricsMotion(to directory: String) throws {
+        let model = AppModel(demo: true)
+        model.preparePreview()
+        model.music.showLyricsPreview(SampleData.lyrics)
+        model.music.toggleLyrics()
+        let controller = IslandPanelController(model: model, observeSystem: false)
+        controller.updatePresentation(animated: false)
+        defer { controller.panel.orderOut(nil) }
+        let top = controller.panel.frame.maxY
+        let width = controller.panel.frame.width
+        for direction in ["opening", "closing"] {
+            model.music.toggleLyrics()
+            for step in 0...8 {
+                RunLoop.current.run(until: Date().addingTimeInterval(0.06))
+                guard abs(controller.panel.frame.maxY - top) < 1,
+                      abs(controller.panel.frame.width - width) < 1,
+                      let view = controller.panel.contentView,
+                      let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else {
+                    throw NSError(domain: "BrimletPreview.LyricsMotion", code: 7)
+                }
+                view.cacheDisplay(in: view.bounds, to: bitmap)
+                if let data = bitmap.representation(using: .png, properties: [:]) {
+                    try data.write(to: URL(fileURLWithPath: "\(directory)/lyrics-\(direction)-\(step).png"))
+                }
+            }
+        }
+    }
+
+    static func captureLyricsLines(to directory: String) throws {
+        let model = AppModel(demo: true)
+        model.preparePreview()
+        let lines = SampleData.lyrics.lines + [
+            LyricsLine(id: 5, timestamp: 114, text: "The lights along the distant shore keep shining through the evening, and every winding road will lead us slowly back to where we started.")
+        ]
+        model.music.showLyricsPreview(SpotifyLyrics(trackID: "demo", lines: lines, isSynced: true))
+        model.music.track?.isPlaying = false
+        model.music.track?.position = 89
+        let controller = IslandPanelController(model: model, observeSystem: false)
+        controller.updatePresentation(animated: false)
+        defer { controller.panel.orderOut(nil) }
+        RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+        model.music.track?.position = 97
+        for step in 0...8 {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.07))
+            guard let view = controller.panel.contentView,
+                  let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { continue }
+            view.cacheDisplay(in: view.bounds, to: bitmap)
+            if let data = bitmap.representation(using: .png, properties: [:]) {
+                try data.write(to: URL(fileURLWithPath: "\(directory)/lyrics-line-transition-\(step).png"))
+            }
+        }
+        model.music.track?.position = 115
+        RunLoop.current.run(until: Date().addingTimeInterval(0.7))
+        if let view = controller.panel.contentView,
+           let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) {
+            view.cacheDisplay(in: view.bounds, to: bitmap)
+            if let data = bitmap.representation(using: .png, properties: [:]) {
+                try data.write(to: URL(fileURLWithPath: "\(directory)/lyrics-long-sentence.png"))
+            }
+        }
     }
 
     static func captureSettings(model: AppModel, scheme: ColorScheme, to path: String) throws {

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.2
+
+Smoother lyrics and a visible update indicator.
+
+- A mint dot on the settings button shows when an update is available. Clicking it opens the update section.
+- The music panel keeps its upper content in place while the lyrics area opens downward and folds upward on close.
+- Synced lyrics scroll smoothly to the next sentence.
+- Long lyric sentences wrap onto additional lines instead of being truncated.
+- Lyrics stop periodic updates while hidden, paused or unsynced.
+- Motion respects the Mac's Reduce Motion setting.
+
 ## 0.2.1
 
 More compact settings and a manageable saved quote library.

@@ -7,6 +7,7 @@ struct MusicCard: View {
     let connect: () -> Void
     var demo = false
     @State private var seekValue: Double?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         if let track = module.track {
@@ -64,10 +65,14 @@ struct MusicCard: View {
                 }
                 .frame(maxWidth: .infinity)
                 .disabled(module.commandPending)
-                if module.lyricsVisible {
-                    LyricsPanel(module: module, track: track)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                }
+                // Keep the content alive while its viewport folds upward on close.
+                LyricsPanel(module: module, track: track)
+                    .frame(height: module.lyricsVisible ? LyricsPresentation.panelHeight : 0, alignment: .top)
+                    .clipped()
+                    .allowsHitTesting(module.lyricsVisible)
+                    .accessibilityHidden(!module.lyricsVisible)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: LyricsPresentation.resizeDuration),
+                               value: module.lyricsVisible)
             }
             .padding(.horizontal, 20)
             .onChange(of: track.id) { _, _ in seekValue = nil }
@@ -133,35 +138,73 @@ private struct LyricsPanel: View {
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
                     Text("Looking for lyrics…").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
-                }.frame(maxWidth: .infinity, alignment: .leading).frame(height: 72)
+                }.frame(maxWidth: .infinity, alignment: .leading).frame(height: LyricsPresentation.viewportHeight)
             } else if let lyrics = module.lyrics, !lyrics.lines.isEmpty {
-                TimelineView(.periodic(from: .now, by: 0.25)) { context in
-                    let position = track.elapsed(at: context.date)
-                    let active = lyrics.activeLine(at: position)
-                    let start = max(0, min(active - 1, max(0, lyrics.lines.count - 4)))
-                    let visible = Array(lyrics.lines.dropFirst(start).prefix(4))
-                    VStack(alignment: .leading, spacing: 5) {
-                        ForEach(visible) { line in
-                            Text(line.text)
-                                .font(.system(size: line.id == lyrics.lines[active].id ? 13 : 11,
-                                              weight: line.id == lyrics.lines[active].id ? .semibold : .regular))
-                                .foregroundStyle(line.id == lyrics.lines[active].id ? Color.white : BrimletTheme.secondary)
-                                .lineLimit(1)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
+                if module.lyricsVisible && track.isPlaying && lyrics.isSynced {
+                    TimelineView(.periodic(from: .now, by: 0.25)) { context in
+                        LyricsLines(lyrics: lyrics, position: track.elapsed(at: context.date))
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(height: 75, alignment: .top)
+                } else {
+                    LyricsLines(lyrics: lyrics, position: track.position)
                 }
             } else {
                 Text("No lyrics found for this track.")
                     .font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading).frame(height: 72, alignment: .top)
+                    .frame(maxWidth: .infinity, alignment: .leading).frame(height: LyricsPresentation.viewportHeight, alignment: .top)
             }
         }
         .padding(12)
+        .frame(height: LyricsPresentation.panelHeight, alignment: .top)
         .background(BrimletTheme.surface, in: RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
+    }
+}
+
+enum LyricsPresentation {
+    static let viewportHeight: CGFloat = 120
+    static let panelHeight: CGFloat = 174
+    static let extraHeight: Double = 200
+    static let resizeDuration: Double = 0.45
+}
+
+struct LyricsLines: View {
+    let lyrics: SpotifyLyrics
+    let position: Double
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        let active = lyrics.activeLine(at: position)
+        ScrollViewReader { reader in
+            ScrollView {
+                // Stable rows let the viewport slide across wrapped sentences instead of replacing them.
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(lyrics.lines) { line in
+                        Text(line.text)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(line.id == lyrics.lines[active].id ? Color.white : BrimletTheme.secondary)
+                            .lineSpacing(4)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .id(line.id)
+                    }
+                    // The last sentence can reach the same reading position as the first.
+                    Color.clear.frame(height: LyricsPresentation.viewportHeight - 18)
+                        .accessibilityHidden(true)
+                }
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.35), value: active)
+            }
+            .scrollIndicators(.hidden)
+            .frame(height: LyricsPresentation.viewportHeight)
+            .onAppear { reader.scrollTo(lyrics.lines[active].id, anchor: .top) }
+            .onChange(of: active) { _, _ in
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.55)) {
+                    reader.scrollTo(lyrics.lines[active].id, anchor: .top)
+                }
+            }
+            .onChange(of: lyrics.trackID) { _, _ in
+                reader.scrollTo(lyrics.lines[active].id, anchor: .top)
+            }
+        }
     }
 }
 
