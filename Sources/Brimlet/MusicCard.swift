@@ -134,8 +134,9 @@ private struct LyricsPanel: View {
             } else if let lyrics = module.lyrics, !lyrics.lines.isEmpty {
                 let ticking = module.lyricsVisible && track.isPlaying && lyrics.isSynced
                 // One timeline for every state, so pausing does not rebuild the lines and lose their scroll offset.
-                TimelineView(.animation(minimumInterval: 0.25, paused: !ticking)) { context in
-                    LyricsLines(lyrics: lyrics, position: track.elapsed(at: ticking ? context.date : .now))
+                // It only paces redraws: after a poll its last date can precede the new observation.
+                TimelineView(.animation(minimumInterval: 0.25, paused: !ticking)) { _ in
+                    LyricsLines(lyrics: lyrics, position: track.elapsed(at: .now))
                 }
                 .id(lyrics.trackID)
             } else {
@@ -163,7 +164,7 @@ enum LyricsPresentation {
 struct LyricsLines: View {
     let lyrics: SpotifyLyrics
     let position: Double
-    @State private var lineTops: [Int: CGFloat] = [:]
+    @State private var lineHeights: [Int: CGFloat] = [:]
     @State private var browsedTop: CGFloat?
     @State private var returnTask: Task<Void, Never>?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -171,8 +172,8 @@ struct LyricsLines: View {
     var body: some View {
         let active = lyrics.activeLine(at: position)
         // The previous sentence stays visible above, so the active one reads as the second line.
-        let followedTop = lineTops[max(active - 1, 0)] ?? 0
-        VStack(alignment: .leading, spacing: 10) {
+        let followedTop = top(of: max(active - 1, 0))
+        VStack(alignment: .leading, spacing: Self.spacing) {
             ForEach(Array(lyrics.lines.enumerated()), id: \.element.id) { index, line in
                 Text(line.text)
                     .font(.system(size: 13, weight: .medium))
@@ -180,14 +181,13 @@ struct LyricsLines: View {
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    // Positions measured here would include the animated offset and feed back into it; heights stay put.
                     .background(GeometryReader { proxy in
-                        Color.clear.preference(key: LyricsLineTops.self,
-                                               value: [index: proxy.frame(in: .named(LyricsLineTops.space)).minY])
+                        Color.clear.preference(key: LyricsLineHeights.self, value: [index: proxy.size.height])
                     })
             }
         }
-        .coordinateSpace(name: LyricsLineTops.space)
-        .onPreferenceChange(LyricsLineTops.self) { lineTops = $0 }
+        .onPreferenceChange(LyricsLineHeights.self) { lineHeights = $0 }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.5), value: active)
         .fixedSize(horizontal: false, vertical: true)
         .padding(.top, LyricsPresentation.edgeFade)
@@ -206,8 +206,14 @@ struct LyricsLines: View {
         .onDisappear { returnTask?.cancel() }
     }
 
+    private static let spacing: CGFloat = 10
+
+    private func top(of index: Int) -> CGFloat {
+        (0..<index).reduce(0) { $0 + (lineHeights[$1] ?? 0) + Self.spacing }
+    }
+
     private func browse(by delta: CGFloat, from followedTop: CGFloat) {
-        let limit = lineTops[lyrics.lines.count - 1] ?? 0
+        let limit = top(of: lyrics.lines.count - 1)
         browsedTop = min(limit, max(0, (browsedTop ?? followedTop) - delta))
         returnTask?.cancel()
         guard lyrics.isSynced else { return }
@@ -219,8 +225,7 @@ struct LyricsLines: View {
     }
 }
 
-private struct LyricsLineTops: PreferenceKey {
-    static let space = "lyrics-lines"
+private struct LyricsLineHeights: PreferenceKey {
     static let defaultValue: [Int: CGFloat] = [:]
 
     static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {

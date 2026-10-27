@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.4
+
+Steady lyrics.
+
+- Fixed lyrics trembling while they glide to the next sentence.
+- After scrolling by hand, the lyrics reliably glide back to the active sentence.
+- Lyrics and the progress bar no longer step back briefly when Spotify reports its position.
+
 ## 0.2.3
 
 Lyrics that glide and keep their place.

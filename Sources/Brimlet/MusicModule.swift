@@ -105,8 +105,14 @@ import BrimletCore
         reading = false
         guard currentGeneration == generation, enabled, !Task.isCancelled else { return }
         switch result {
-        case .success(let value):
+        case .success(var value):
             let previousID = track?.id
+            // Apple Event replies arrive with varying delay, so small corrections would only make the position step back and forth.
+            if let current = track, let latest = value, current.id == latest.id, current.isPlaying, latest.isPlaying,
+               abs(latest.position - current.elapsed(at: latest.observedAt)) < 0.5 {
+                value?.position = current.position
+                value?.observedAt = current.observedAt
+            }
             track = value
             connection = .connected
             if previousID != value?.id {
