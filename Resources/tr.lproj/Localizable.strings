@@ -257,10 +257,8 @@
 "No apps allowed yet" = "Henüz izin verilen uygulama yok";
 "Not connected" = "Bağlı değil";
 "Notifications" = "Bildirimler";
-"Plain" = "Düz metin";
 "Small View" = "Küçük görünüm";
 "Starts Brimlet when you log in." = "Oturum açtığında Brimlet’i başlatır.";
-"Synced" = "Eşzamanlı";
 "Turn On" = "Aç";
 "Turn on Music to connect Spotify." = "Spotify’a bağlanmak için Müzik’i aç.";
 "cmux" = "cmux";

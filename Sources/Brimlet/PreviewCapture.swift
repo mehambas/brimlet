@@ -176,7 +176,7 @@ final class MemoryDefaults: UserDefaults {
         defer { controller.panel.orderOut(nil) }
         RunLoop.current.run(until: Date().addingTimeInterval(0.3))
         model.music.track?.position = 97
-        for step in 0...8 {
+        for step in 0...12 {
             RunLoop.current.run(until: Date().addingTimeInterval(0.07))
             guard let view = controller.panel.contentView,
                   let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { continue }
@@ -186,7 +186,7 @@ final class MemoryDefaults: UserDefaults {
             }
         }
         model.music.track?.position = 115
-        RunLoop.current.run(until: Date().addingTimeInterval(0.7))
+        RunLoop.current.run(until: Date().addingTimeInterval(1.4))
         if let view = controller.panel.contentView,
            let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) {
             view.cacheDisplay(in: view.bounds, to: bitmap)

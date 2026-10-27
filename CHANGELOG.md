@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.3
+
+Lyrics that glide and keep their place.
+
+- Synced lyrics glide to the next sentence with a soft, interruptible motion and fade out at the edges.
+- The active sentence sits second, below the one just sung.
+- Scroll through the lyrics with the trackpad or mouse wheel; after three seconds they glide back to the active sentence.
+- Pausing and resuming keeps the lyrics where they are.
+- Removed the Synced / Plain label from the lyrics header.
+
 ## 0.2.2
 
 Smoother lyrics and a visible update indicator.

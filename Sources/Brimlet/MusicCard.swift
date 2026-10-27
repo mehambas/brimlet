@@ -123,30 +123,21 @@ private struct LyricsPanel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            HStack {
-                Text("Lyrics")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(BrimletTheme.secondary)
-                Spacer()
-                Text(module.lyrics?.isSynced == true ? "Synced" : "Plain")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(BrimletTheme.secondary)
-                    .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(BrimletTheme.raised, in: RoundedRectangle(cornerRadius: 5))
-            }
+            Text("Lyrics")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(BrimletTheme.secondary)
             if module.lyricsLoading {
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
                     Text("Looking for lyrics…").font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
                 }.frame(maxWidth: .infinity, alignment: .leading).frame(height: LyricsPresentation.viewportHeight)
             } else if let lyrics = module.lyrics, !lyrics.lines.isEmpty {
-                if module.lyricsVisible && track.isPlaying && lyrics.isSynced {
-                    TimelineView(.periodic(from: .now, by: 0.25)) { context in
-                        LyricsLines(lyrics: lyrics, position: track.elapsed(at: context.date))
-                    }
-                } else {
-                    LyricsLines(lyrics: lyrics, position: track.position)
+                let ticking = module.lyricsVisible && track.isPlaying && lyrics.isSynced
+                // One timeline for every state, so pausing does not rebuild the lines and lose their scroll offset.
+                TimelineView(.animation(minimumInterval: 0.25, paused: !ticking)) { context in
+                    LyricsLines(lyrics: lyrics, position: track.elapsed(at: ticking ? context.date : .now))
                 }
+                .id(lyrics.trackID)
             } else {
                 Text("No lyrics found for this track.")
                     .font(.system(size: 11)).foregroundStyle(BrimletTheme.secondary)
@@ -165,45 +156,97 @@ enum LyricsPresentation {
     static let panelHeight: CGFloat = 174
     static let extraHeight: Double = 200
     static let resizeDuration: Double = 0.45
+    static let edgeFade: CGFloat = 10
+    static let returnDelay: Double = 3
 }
 
 struct LyricsLines: View {
     let lyrics: SpotifyLyrics
     let position: Double
+    @State private var lineTops: [Int: CGFloat] = [:]
+    @State private var browsedTop: CGFloat?
+    @State private var returnTask: Task<Void, Never>?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let active = lyrics.activeLine(at: position)
-        ScrollViewReader { reader in
-            ScrollView {
-                // Stable rows let the viewport slide across wrapped sentences instead of replacing them.
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(lyrics.lines) { line in
-                        Text(line.text)
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(line.id == lyrics.lines[active].id ? Color.white : BrimletTheme.secondary)
-                            .lineSpacing(4)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .id(line.id)
-                    }
-                    // The last sentence can reach the same reading position as the first.
-                    Color.clear.frame(height: LyricsPresentation.viewportHeight - 18)
-                        .accessibilityHidden(true)
-                }
-                .animation(reduceMotion ? nil : .easeInOut(duration: 0.35), value: active)
+        // The previous sentence stays visible above, so the active one reads as the second line.
+        let followedTop = lineTops[max(active - 1, 0)] ?? 0
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(Array(lyrics.lines.enumerated()), id: \.element.id) { index, line in
+                Text(line.text)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(index == active ? Color.white : BrimletTheme.secondary)
+                    .lineSpacing(4)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(GeometryReader { proxy in
+                        Color.clear.preference(key: LyricsLineTops.self,
+                                               value: [index: proxy.frame(in: .named(LyricsLineTops.space)).minY])
+                    })
             }
-            .scrollIndicators(.hidden)
-            .frame(height: LyricsPresentation.viewportHeight)
-            .onAppear { reader.scrollTo(lyrics.lines[active].id, anchor: .top) }
-            .onChange(of: active) { _, _ in
-                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.55)) {
-                    reader.scrollTo(lyrics.lines[active].id, anchor: .top)
-                }
-            }
-            .onChange(of: lyrics.trackID) { _, _ in
-                reader.scrollTo(lyrics.lines[active].id, anchor: .top)
-            }
+        }
+        .coordinateSpace(name: LyricsLineTops.space)
+        .onPreferenceChange(LyricsLineTops.self) { lineTops = $0 }
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.5), value: active)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.top, LyricsPresentation.edgeFade)
+        .offset(y: -(browsedTop ?? followedTop))
+        .animation(reduceMotion ? nil : .smooth(duration: 0.8), value: followedTop)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: LyricsPresentation.viewportHeight, alignment: .top)
+        .mask(LinearGradient(stops: [
+            .init(color: .clear, location: 0),
+            .init(color: .black, location: LyricsPresentation.edgeFade / LyricsPresentation.viewportHeight),
+            .init(color: .black, location: 0.85),
+            .init(color: .clear, location: 1)
+        ], startPoint: .top, endPoint: .bottom))
+        .contentShape(Rectangle())
+        .overlay(ScrollWheelCatcher { browse(by: $0, from: followedTop) }.accessibilityHidden(true))
+        .onDisappear { returnTask?.cancel() }
+    }
+
+    private func browse(by delta: CGFloat, from followedTop: CGFloat) {
+        let limit = lineTops[lyrics.lines.count - 1] ?? 0
+        browsedTop = min(limit, max(0, (browsedTop ?? followedTop) - delta))
+        returnTask?.cancel()
+        guard lyrics.isSynced else { return }
+        returnTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(LyricsPresentation.returnDelay))
+            guard !Task.isCancelled else { return }
+            withAnimation(reduceMotion ? nil : .smooth(duration: 1)) { browsedTop = nil }
+        }
+    }
+}
+
+private struct LyricsLineTops: PreferenceKey {
+    static let space = "lyrics-lines"
+    static let defaultValue: [Int: CGFloat] = [:]
+
+    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+        value.merge(nextValue()) { $1 }
+    }
+}
+
+/// SwiftUI on macOS 14 cannot tell a person's scrolling apart from programmatic scrolling, so wheel events are read directly.
+private struct ScrollWheelCatcher: NSViewRepresentable {
+    let onScroll: (CGFloat) -> Void
+
+    func makeNSView(context: Context) -> CatcherView {
+        let view = CatcherView()
+        view.onScroll = onScroll
+        return view
+    }
+
+    func updateNSView(_ view: CatcherView, context: Context) {
+        view.onScroll = onScroll
+    }
+
+    final class CatcherView: NSView {
+        var onScroll: ((CGFloat) -> Void)?
+
+        override func scrollWheel(with event: NSEvent) {
+            onScroll?(event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : event.scrollingDeltaY * 10)
         }
     }
 }
