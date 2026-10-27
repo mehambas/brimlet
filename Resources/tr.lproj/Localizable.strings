@@ -23,7 +23,6 @@
 "Add a Date" = "Tarih ekle";
 "Add to Brimlet as Quote" = "Brimlet’e söz olarak ekle";
 "Agenda" = "Gündem";
-"Album art comes from Spotify’s servers and lyrics from LRCLIB. There is no account and no analytics, and nothing is sent to a server of ours." = "Albüm kapakları Spotify’ın sunucularından, şarkı sözleri LRCLIB’den gelir. Hesap ve analitik yoktur; kendi sunucumuza hiçbir şey gönderilmez.";
 "All" = "Tümü";
 "All Calendars" = "Tüm takvimler";
 "All day" = "Tüm gün";
@@ -38,8 +37,6 @@
 "Brimlet %@" = "Brimlet %@";
 "Brimlet %@ is available" = "Brimlet %@ yayımlandı";
 "Brimlet Settings" = "Brimlet Ayarları";
-"Brimlet asks for macOS Automation access only when you connect Spotify. It uses it to read the current track and control playback." = "Brimlet, macOS Otomasyon iznini yalnızca Spotify’a bağlandığında ister. Bu izin parça bilgisini okumak ve oynatmayı kontrol etmek için kullanılır.";
-"Brimlet follows the Reduce Motion setting of macOS. Click its top bar to close it, or press Esc while it has keyboard focus." = "Brimlet, macOS’in Hareketi Azalt ayarına uyar. Kapatmak için üst çubuğuna tıkla; panel klavye odağındayken Esc de kullanabilirsin.";
 "Brimlet is ready as soon as Spotify plays." = "Spotify çalmaya başladığında Brimlet hazır.";
 "Brimlet needs permission to control Spotify." = "Spotify otomasyon izni gerekli.";
 "Brimlet needs your permission." = "Spotify için izin gerekiyor.";
@@ -125,7 +122,6 @@
 "Music" = "Müzik";
 "New Task" = "Yeni görev";
 "Next Track" = "Sonraki parça";
-"No account, no analytics." = "Hesap yok, analitik yok.";
 "No calendar is selected, so no events or reminders are shown." = "Hiçbir takvim seçili değil. Etkinlikler ve hatırlatmalar gösterilmez.";
 "No events in this range" = "Bu aralıkta etkinlik yok";
 "No lyrics found for this track." = "Bu parça için söz bulunamadı.";
@@ -261,7 +257,6 @@
 "No apps allowed yet" = "Henüz izin verilen uygulama yok";
 "Not connected" = "Bağlı değil";
 "Notifications" = "Bildirimler";
-"On Screen" = "Ekranda";
 "Plain" = "Düz metin";
 "Small View" = "Küçük görünüm";
 "Starts Brimlet when you log in." = "Oturum açtığında Brimlet’i başlatır.";
@@ -269,3 +264,8 @@
 "Turn On" = "Aç";
 "Turn on Music to connect Spotify." = "Spotify’a bağlanmak için Müzik’i aç.";
 "cmux" = "cmux";
+"Search quotes, authors or sources" = "Söz, yazar veya kaynak ara";
+"No matching quotes" = "Eşleşen söz yok";
+"Previous" = "Önceki";
+"Next" = "Sonraki";
+"Page %lld of %lld" = "Sayfa %lld / %lld";

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1
+
+More compact settings and a manageable saved quote library.
+
+- Settings tabs have more padding and respond across their entire button area.
+- Removed the extra General explanations and the redundant display section heading.
+- Calendar accounts appear beside calendar names in compact, single-line rows.
+- Search saved quotes by text, author or source, and browse five quotes per page.
+- Show any saved quote directly from its row.
+- Updated Turkish translations.
+
 ## 0.2.0
 
 A refreshed Mac interface inspired by Brimlet’s graphite and mint icon.

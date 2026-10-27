@@ -73,12 +73,16 @@ private struct SettingsToolbarButton: View {
     let action: () -> Void
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 3) {
+            VStack(spacing: 5) {
                 Image(systemName: tab.symbol).font(.system(size: 21, weight: .regular))
                     .foregroundStyle(model.settingsTab == tab ? BrimletTheme.jade : Color.secondary)
                 Text(tab.title).font(.system(size: 11))
                     .foregroundStyle(model.settingsTab == tab ? Color.primary : Color.secondary)
-            }.padding(.horizontal, 8).frame(minWidth: 60, minHeight: 48)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .frame(minWidth: 72, minHeight: 62)
+            .contentShape(Rectangle())
         }.buttonStyle(.plain).help(tab.title).accessibilityLabel(tab.title)
             .accessibilityAddTraits(model.settingsTab == tab ? .isSelected : [])
     }

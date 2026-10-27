@@ -26,10 +26,11 @@ enum SettingsTab: String, CaseIterable {
     }
     @MainActor func height(model: AppModel) -> CGFloat {
         switch self {
-        case .general, .modules: return 620
+        case .general: return 460
+        case .modules: return 620
         case .calendar: return model.preferences.calendarEnabled ? min(620, 330 + CGFloat(model.calendar.calendars.count) * 42) : 290
         case .notifications: return min(620, 290 + CGFloat(model.preferences.externalNotificationRequirements.count) * 48)
-        case .quotes: return min(620, 360 + CGFloat(model.quotes.quotes.count) * 80)
+        case .quotes: return model.quotes.quotes.isEmpty ? 360 : 620
         }
     }
 }
@@ -41,6 +42,24 @@ struct SettingsView: View {
     var tab: SettingsTab? = nil
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var loginError: String?
+    @State private var quoteSearch = ""
+    @State private var quotePage = 0
+    private let quotesPerPage = 5
+
+    private var filteredQuotes: [SavedQuote] {
+        let query = quoteSearch.trimmingCharacters(in: .whitespacesAndNewlines)
+        return model.quotes.quotes.filter {
+            query.isEmpty || [$0.text, $0.author, $0.source].contains {
+                $0.localizedStandardContains(query)
+            }
+        }
+    }
+
+    private var quotePageCount: Int { max(1, (filteredQuotes.count + quotesPerPage - 1) / quotesPerPage) }
+    private var currentQuotePage: Int { min(quotePage, quotePageCount - 1) }
+    private var visibleQuotes: [SavedQuote] {
+        Array(filteredQuotes.dropFirst(currentQuotePage * quotesPerPage).prefix(quotesPerPage))
+    }
 
     var body: some View {
         Form {
@@ -52,6 +71,7 @@ struct SettingsView: View {
             case .quotes: quoteSettings
             }
         }
+        .onChange(of: model.quotes.quotes.count) { _, _ in quotePage = currentQuotePage }
         .formStyle(.grouped)
         .font(.system(size: 13))
         .controlSize(.small)
@@ -156,13 +176,14 @@ struct SettingsView: View {
                                 if selected { ids.insert(source.id) } else { ids.remove(source.id) }
                                 preferences.calendarSelection = ids.sorted()
                             })) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    HStack(spacing: 6) {
-                                        if let color = source.colorRGB { Circle().fill(Color(hex: color)).frame(width: 7, height: 7) }
-                                        Text(source.title)
-                                    }
+                                HStack(spacing: 6) {
+                                    if let color = source.colorRGB { Circle().fill(Color(hex: color)).frame(width: 7, height: 7) }
+                                    Text(source.title).lineLimit(1).help(source.title).layoutPriority(1)
+                                    Spacer(minLength: 8)
                                     Text(source.account).font(.system(size: 11)).foregroundStyle(.secondary)
+                                        .lineLimit(1).help(source.account)
                                 }
+                                .frame(maxWidth: .infinity)
                             }.toggleStyle(.checkbox)
                         }
                         if model.calendar.calendars.isEmpty { footnote("Your calendars appear here once Brimlet has access.") }
@@ -249,19 +270,44 @@ struct SettingsView: View {
                 if model.quotes.quotes.isEmpty {
                     footnote("Select some text in a PDF or a web page, Control-click it and choose Services › Add to Brimlet as Quote.")
                 }
-                ForEach(model.quotes.quotes) { quote in
-                    HStack(alignment: .top, spacing: 12) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(verbatim: "“\(quote.text)”").font(.system(size: 13, design: .serif)).lineLimit(3)
-                            let attribution = [quote.author, quote.source].filter { !$0.isEmpty }.joined(separator: " · ")
-                            if !attribution.isEmpty { Text(attribution).font(.system(size: 11)).foregroundStyle(.secondary) }
-                        }
-                        Spacer(minLength: 0)
-                        Button(role: .destructive) { model.quotes.delete(quote) } label: { Image(systemName: "trash") }
-                            .buttonStyle(.borderless).help("Delete Quote").accessibilityLabel("Delete Quote")
+                if !model.quotes.quotes.isEmpty {
+                    TextField("Search quotes, authors or sources", text: $quoteSearch, prompt: Text("Search quotes, authors or sources"))
+                        .labelsHidden()
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: quoteSearch) { _, _ in quotePage = 0 }
+                    if filteredQuotes.isEmpty {
+                        Text("No matching quotes").foregroundStyle(.secondary)
                     }
                 }
-                if let quote = model.quotes.quotes.first { Button("Show Now") { model.onShowQuote?(quote) } }
+                if quotePageCount > 1 {
+                    HStack {
+                        Button("Previous") { quotePage = currentQuotePage - 1 }
+                            .disabled(currentQuotePage == 0)
+                        Spacer()
+                        Text("Page \(currentQuotePage + 1) of \(quotePageCount)")
+                            .font(.system(size: 11)).foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Next") { quotePage = currentQuotePage + 1 }
+                            .disabled(currentQuotePage == quotePageCount - 1)
+                    }
+                }
+                ForEach(visibleQuotes) { quote in
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(verbatim: "“\(quote.text)”").font(.system(size: 13, design: .serif)).lineLimit(2)
+                            let attribution = [quote.author, quote.source].filter { !$0.isEmpty }.joined(separator: " · ")
+                            if !attribution.isEmpty { Text(attribution).font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1).help(attribution) }
+                        }
+                        Spacer(minLength: 0)
+                        VStack(spacing: 12) {
+                            Button { model.onShowQuote?(quote) } label: { Image(systemName: "play") }
+                                .buttonStyle(.borderless).help("Show Now").accessibilityLabel("Show Now")
+                            Button(role: .destructive) { model.quotes.delete(quote) } label: { Image(systemName: "trash") }
+                                .buttonStyle(.borderless).help("Delete Quote").accessibilityLabel("Delete Quote")
+                        }
+                    }
+                }
+
             } header: { Text("Saved quotes · \(model.quotes.quotes.count)") } footer: {
                 footnote("Your quotes are kept on this Mac. Quotes you haven’t seen yet come first.")
             }
@@ -293,13 +339,6 @@ struct SettingsView: View {
                 settingToggle("Expand on hover", detail: "You can also click it open.", value: $preferences.expandOnHover)
                 settingToggle("Hide in full screen", detail: "Leaves the space empty when an app fills the screen.", value: $preferences.hideInFullscreen)
                 Button("Show Brimlet") { model.hidden = false; model.expand() }
-            } header: { Text("On Screen") } footer: {
-                footnote("Brimlet follows the Reduce Motion setting of macOS. Click its top bar to close it, or press Esc while it has keyboard focus.")
-            }
-            Section {
-                Label("No account, no analytics.", systemImage: "lock.shield")
-                footnote("Brimlet asks for macOS Automation access only when you connect Spotify. It uses it to read the current track and control playback.")
-                footnote("Album art comes from Spotify’s servers and lyrics from LRCLIB. There is no account and no analytics, and nothing is sent to a server of ours.")
             }
         }
     }

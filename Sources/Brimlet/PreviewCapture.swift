@@ -80,6 +80,15 @@ final class MemoryDefaults: UserDefaults {
                 }
                 try save(TodoEditor(module: model.todos), to: "\(directory)/\(scheme)-task-editor.png", scheme: scheme)
             }
+            let quoteLibrary = AppModel(demo: true)
+            let sampleQuote = SampleData.quote
+            for index in 1...103 {
+                quoteLibrary.quotes.add(text: sampleQuote.text, source: "\(sampleQuote.source) · \(index)", author: sampleQuote.author)
+            }
+            quoteLibrary.settingsTab = .quotes
+            for scheme in [ColorScheme.light, .dark] {
+                try captureSettings(model: quoteLibrary, scheme: scheme, to: "\(directory)/\(scheme)-settings-quotes-library.png")
+            }
             model.select(.todos)
             model.todos.add(title: "Read the design notes", note: "Brimlet", category: .work, dueDate: Date(), reminder: false)
             try save(IslandView(model: model).padding(40).background(background), to: "\(directory)/tasks.png")
