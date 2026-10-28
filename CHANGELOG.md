@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.5
+
+On every desktop.
+
+- Fixed Brimlet showing on only one desktop after the Mac or its display woke from sleep or a display was connected. Until now this needed a relaunch.
+
 ## 0.2.4
 
 Steady lyrics.
