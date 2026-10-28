@@ -33,7 +33,7 @@ private final class IslandHostingView: NSHostingView<IslandView> {
         panel.appearance = NSAppearance(named: .darkAqua)
         panel.hasShadow = false
         panel.level = .statusBar
-        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
+        panel.collectionBehavior = Self.collectionBehavior
         panel.isMovable = false
         panel.isReleasedWhenClosed = false
         panel.animationBehavior = .none
@@ -44,12 +44,16 @@ private final class IslandHostingView: NSHostingView<IslandView> {
         refreshScreen()
         guard observeSystem else { return }
         observers.append(NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
-            Task { @MainActor in self?.refreshScreen() }
+            Task { @MainActor in
+                self?.rejoinAllSpaces()
+                self?.refreshScreen()
+            }
         })
         let workspace = NSWorkspace.shared.notificationCenter
         for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.activeSpaceDidChangeNotification] {
             observers.append(workspace.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 Task { @MainActor in
+                    self?.rejoinAllSpaces()
                     self?.model.collapse()
                     self?.model.refreshAfterWake()
                     self?.refreshScreen()
@@ -85,6 +89,15 @@ private final class IslandHostingView: NSHostingView<IslandView> {
         }
         RunLoop.main.add(timer, forMode: .common)
         fullscreenTimer = timer
+    }
+
+    private static let collectionBehavior: NSWindow.CollectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
+
+    /// After display sleep or a display change, macOS can pin the panel to a single Space.
+    /// Clearing first matters: assigning an unchanged value does not re-register the window.
+    private func rejoinAllSpaces() {
+        panel.collectionBehavior = []
+        panel.collectionBehavior = Self.collectionBehavior
     }
 
     static func displayID(_ screen: NSScreen) -> String {
